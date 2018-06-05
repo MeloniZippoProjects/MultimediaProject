@@ -5,12 +5,14 @@ import melonizippo.org.facerecognition.algorithms.deep.DNNExtractor;
 import melonizippo.org.facerecognition.algorithms.deep.ImgDescriptor;
 import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.KNNClassifier;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.Parameters;
 import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.PredictedClass;
 import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.tools.BoundingBox;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
 import org.bytedeco.javacpp.avcodec;
 import org.bytedeco.javacpp.opencv_core.Rect;
@@ -22,6 +24,10 @@ import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.OpenCVFrameConverter;
+
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 
 public class VideoFaceRecognizer {
 
@@ -36,21 +42,30 @@ public class VideoFaceRecognizer {
 	private OpenCVFrameConverter.ToMat frame2Mat;
 
 	private DNNExtractor extractor;
-	
-	private CanvasFrame canvas;
 
-	public VideoFaceRecognizer(String haarcascadePath, File storageFile) throws ClassNotFoundException, IOException {
+	private Canvas outputCanvas;
+
+	public VideoFaceRecognizer(
+			String haarcascadePath,
+			File storageFile,
+			Canvas outputCanvas
+	)
+			throws ClassNotFoundException, IOException
+	{
 		extractor = new DNNExtractor();
 		faceDetector = new FaceDetector(haarcascadePath);
 		knnClassifier = new KNNClassifier(storageFile);
 		frame2Mat = new OpenCVFrameConverter.ToMat();
-		
-		canvas = new CanvasFrame("OpenCV Face Recognition");
+		this.outputCanvas = outputCanvas;
+
+		/*canvas = new CanvasFrame("OpenCV Face Recognition");
 		canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-		canvas.setCanvasSize(Parameters.VIDEO_WIDTH, Parameters.VIDEO_HEIGHT);
+		canvas.setCanvasSize(Parameters.VIDEO_WIDTH, Parameters.VIDEO_HEIGHT);*/
 	}
 
-	public void initVideo(File srcVideo, File destVideoFile) throws Exception {
+	public void initVideo(File srcVideo, File destVideoFile)
+			throws Exception
+	{
 		grabber = FFmpegFrameGrabber.createDefault(srcVideo);
 		grabber.start();
 		
@@ -64,13 +79,17 @@ public class VideoFaceRecognizer {
 		recorder.start();
 	}
 
-	public void closeRecorder() throws org.bytedeco.javacv.FrameRecorder.Exception {
+	public void closeRecorder()
+			throws org.bytedeco.javacv.FrameRecorder.Exception
+	{
 		recorder.stop();
 		recorder.close();
 	}
 
 	//TODO
-	public void analyzeVideo() throws Exception {
+	public void analyzeVideo()
+			throws Exception
+	{
 		Frame frame;
 		
 		while ((frame = grabber.grab()) != null) {
@@ -95,14 +114,25 @@ public class VideoFaceRecognizer {
 				BoundingBox.highlight(matFrame, faces.get(i), label);
 			}
 
-
-
-			canvas.showImage(frame);
+			showFrame(frame);
 
 			recorder.record(frame);
 
 		}
 		closeRecorder();
 
+	}
+
+	//for testing only
+	Random rng = new Random();
+
+	//todo: implement print on canvas
+	private void showFrame(Frame frame)
+	{
+		//print on outputCanvas somehow
+		Paint paint = new Paint();
+		paint.setColor(rng.nextInt());
+		paint.setStyle(Paint.Style.FILL);
+		outputCanvas.drawPaint(paint);
 	}
 }
