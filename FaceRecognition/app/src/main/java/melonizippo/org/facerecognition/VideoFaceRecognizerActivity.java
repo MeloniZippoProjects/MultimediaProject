@@ -7,7 +7,10 @@ import android.widget.ImageView;
 
 import org.bytedeco.javacv.FrameFilter;
 
+import java.io.File;
+
 import melonizippo.org.facerecognition.algorithms.VideoFaceRecognizer;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.Parameters;
 
 public class VideoFaceRecognizerActivity extends AppCompatActivity {
 
@@ -25,10 +28,16 @@ public class VideoFaceRecognizerActivity extends AppCompatActivity {
 
         try {
             videoFaceRecognizer = new VideoFaceRecognizer(
-                    null,
-                    null,
-                    frameView
-            );
-        } catch (Exception e) {}
+                    Parameters.HAAR_CASCADE_FRONTALFACE,
+                    Parameters.STORAGE_FILE,
+                    frameView );
+
+            videoFaceRecognizer.initVideo(
+                    new File(Parameters.VIDEO_PATH),
+                    Parameters.DEST_VIDEO );
+            videoFaceRecognizer.analyzeVideo();
+            videoFaceRecognizer.closeRecorder();
+        }
+        catch (Exception e) {}
     }
 }
