@@ -1,9 +1,9 @@
 package melonizippo.org.facerecognition.algorithms.deep.seq;
 
-import it.unipi.ing.mim.deep.DNNExtractor;
-import it.unipi.ing.mim.deep.ImgDescriptor;
-import it.unipi.ing.mim.deep.tools.FeaturesStorage;
-import it.unipi.ing.mim.opencv.facerecognition.Parameters;
+import melonizippo.org.facerecognition.algorithms.deep.DNNExtractor;
+import melonizippo.org.facerecognition.algorithms.deep.ImgDescriptor;
+import melonizippo.org.facerecognition.algorithms.deep.tools.FeaturesStorage;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.Parameters;
 
 import java.io.File;
 import java.io.IOException;

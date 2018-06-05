@@ -1,7 +1,7 @@
 package melonizippo.org.facerecognition.algorithms.opencv.facerecognition;
 
-import it.unipi.ing.mim.deep.ImgDescriptor;
-import it.unipi.ing.mim.deep.seq.SeqImageSearch;
+import melonizippo.org.facerecognition.algorithms.deep.ImgDescriptor;
+import melonizippo.org.facerecognition.algorithms.deep.seq.SeqImageSearch;
 
 import java.io.File;
 import java.io.IOException;

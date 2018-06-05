@@ -1,12 +1,12 @@
 package melonizippo.org.facerecognition.algorithms;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
-import it.unipi.ing.mim.deep.DNNExtractor;
-import it.unipi.ing.mim.deep.ImgDescriptor;
-import it.unipi.ing.mim.opencv.facerecognition.FaceDetector;
-import it.unipi.ing.mim.opencv.facerecognition.KNNClassifier;
-import it.unipi.ing.mim.opencv.facerecognition.PredictedClass;
-import it.unipi.ing.mim.opencv.facerecognition.tools.BoundingBox;
+import melonizippo.org.facerecognition.algorithms.deep.DNNExtractor;
+import melonizippo.org.facerecognition.algorithms.deep.ImgDescriptor;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.KNNClassifier;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.PredictedClass;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.tools.BoundingBox;
 
 import java.io.File;
 import java.io.FileOutputStream;

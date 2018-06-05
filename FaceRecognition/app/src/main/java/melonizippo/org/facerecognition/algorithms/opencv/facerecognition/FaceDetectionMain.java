@@ -5,9 +5,9 @@ import static org.bytedeco.javacpp.opencv_highgui.imshow;
 import static org.bytedeco.javacpp.opencv_highgui.waitKey;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
-import it.unipi.ing.mim.opencv.facerecognition.FaceDetector;
-import it.unipi.ing.mim.opencv.facerecognition.Parameters;
-import it.unipi.ing.mim.opencv.facerecognition.tools.BoundingBox;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.Parameters;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.tools.BoundingBox;
 
 import java.io.File;
 

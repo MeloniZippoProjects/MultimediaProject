@@ -2,8 +2,8 @@ package melonizippo.org.facerecognition.algorithms.opencv.facerecognition;
 
 import java.io.File;
 
-import it.unipi.ing.mim.opencv.facerecognition.Parameters;
-import it.unipi.ing.mim.opencv.facerecognition.VideoFaceRecognizer;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.Parameters;
+import melonizippo.org.facerecognition.algorithms.opencv.facerecognition.VideoFaceRecognizer;
 
 public class VideoFaceRecognitionMain {
 	

@@ -1,6 +1,6 @@
 package melonizippo.org.facerecognition.algorithms.deep.tools;
 
-import it.unipi.ing.mim.deep.ImgDescriptor;
+import melonizippo.org.facerecognition.algorithms.deep.ImgDescriptor;
 
 import java.io.File;
 import java.io.FileInputStream;
