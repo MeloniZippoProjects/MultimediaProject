@@ -9,4 +9,4 @@
 /build
 /captures
 .externalNativeBuild
-*_tmp__
+*_tmp__*
