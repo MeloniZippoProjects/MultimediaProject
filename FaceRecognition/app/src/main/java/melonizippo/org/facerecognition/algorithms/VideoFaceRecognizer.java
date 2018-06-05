@@ -25,9 +25,11 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.widget.ImageView;
 
 public class VideoFaceRecognizer {
 
@@ -43,12 +45,12 @@ public class VideoFaceRecognizer {
 
 	private DNNExtractor extractor;
 
-	private Canvas outputCanvas;
+	private ImageView outputView;
 
 	public VideoFaceRecognizer(
 			String haarcascadePath,
 			File storageFile,
-			Canvas outputCanvas
+			ImageView outputView
 	)
 			throws ClassNotFoundException, IOException
 	{
@@ -56,7 +58,7 @@ public class VideoFaceRecognizer {
 		faceDetector = new FaceDetector(haarcascadePath);
 		knnClassifier = new KNNClassifier(storageFile);
 		frame2Mat = new OpenCVFrameConverter.ToMat();
-		this.outputCanvas = outputCanvas;
+		this.outputView = outputView;
 
 		/*canvas = new CanvasFrame("OpenCV Face Recognition");
 		canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
@@ -126,13 +128,18 @@ public class VideoFaceRecognizer {
 	//for testing only
 	Random rng = new Random();
 
-	//todo: implement print on canvas
+	//todo: implement print on outputView
 	private void showFrame(Frame frame)
 	{
-		//print on outputCanvas somehow
-		Paint paint = new Paint();
-		paint.setColor(rng.nextInt());
-		paint.setStyle(Paint.Style.FILL);
-		outputCanvas.drawPaint(paint);
+        Bitmap bitmap = Bitmap.createBitmap(
+            outputView.getHeight(),
+            outputView.getWidth(),
+            Bitmap.Config.ARGB_8888
+        );
+
+        Canvas canvas = new Canvas(bitmap);
+		canvas.drawColor(rng.nextInt());
+
+		outputView.draw(canvas);
 	}
 }
