@@ -11,11 +11,18 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Surface;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCamera2View;
 import org.opencv.android.JavaCameraView;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+
+import org.opencv.core.Point;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Core;
 
 public class CameraTestActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -99,6 +106,32 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
     {
-        return inputFrame.gray();
+        Mat frameMat = inputFrame.rgba();
+        int degrees = -1 * getOrientationDegrees();
+        if(degrees != 0) //check for potrait mode
+        {
+            Mat rotationMat = Imgproc.getRotationMatrix2D(new Point(frameMat.width() / 2, frameMat.height() / 2), degrees, 1);
+            //Mat rotatedMat = new Mat(new Size(frameMat.height(), frameMat.width()), CvType.CV_8UC4);
+            Mat rotatedMat = new Mat();
+            Imgproc.warpAffine(frameMat, rotatedMat, rotationMat, frameMat.size());
+            return rotatedMat;
+        }
+        else
+            return frameMat;
+    }
+
+    private int getOrientationDegrees()
+    {
+        int rotation = this.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 90; break;
+            case Surface.ROTATION_90: degrees = 0; break;
+            case Surface.ROTATION_180: degrees = 270; break;
+            case Surface.ROTATION_270: degrees = 180; break;
+        }
+
+        return degrees;
     }
 }
