@@ -12,3 +12,4 @@
 /captures
 .externalNativeBuild
 *_tmp__*
+/openCVLibrary341/build/
