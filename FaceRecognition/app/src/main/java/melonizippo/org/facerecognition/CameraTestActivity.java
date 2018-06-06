@@ -12,10 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCamera2View;
 import org.opencv.android.JavaCameraView;
+import org.opencv.core.Mat;
 
-public class CameraTestActivity extends AppCompatActivity {
+public class CameraTestActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final int PERMISSION_CAMERA = 1;
     JavaCameraView javaCameraView;
@@ -26,6 +28,7 @@ public class CameraTestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera_test);
 
         javaCameraView = findViewById(R.id.HelloOpenCvView);
+        javaCameraView.setCvCameraViewListener(this);
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
@@ -81,4 +84,21 @@ public class CameraTestActivity extends AppCompatActivity {
             javaCameraView.disableView();
     }
 
+    @Override
+    public void onCameraViewStarted(int width, int height)
+    {
+
+    }
+
+    @Override
+    public void onCameraViewStopped()
+    {
+
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
+    {
+        return inputFrame.gray();
+    }
 }
