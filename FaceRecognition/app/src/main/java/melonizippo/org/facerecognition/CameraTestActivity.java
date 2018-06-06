@@ -24,6 +24,7 @@ public class CameraTestActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_test);
+
         javaCameraView = findViewById(R.id.HelloOpenCvView);
 
         if (ContextCompat.checkSelfPermission(this,
@@ -63,4 +64,21 @@ public class CameraTestActivity extends AppCompatActivity {
             Log.e("prova", "cannot open camera");
         }
     }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        if (javaCameraView != null)
+            javaCameraView.disableView();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if (javaCameraView != null)
+            javaCameraView.disableView();
+    }
+
 }
