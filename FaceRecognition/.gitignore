@@ -3,7 +3,7 @@
 /local.properties
 /.idea/libraries
 /.idea/modules.xml
-/.idea/workspace.xml
+/.idea/workspace.xml*
 /.idea/caches/
 /.idea/assetWizardSettings.xml
 /app/libs_not_used
@@ -11,3 +11,4 @@
 /build
 /captures
 .externalNativeBuild
+*_tmp__*
