@@ -24,10 +24,19 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
 
+import java.io.File;
+
+import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
+
 public class CameraTestActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final int PERMISSION_CAMERA = 1;
     JavaCameraView javaCameraView;
+    private DNNExtractor extractor;
+    private FaceDetector faceDetector;
+    private KNNClassifier knnClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +103,11 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     public void onCameraViewStarted(int width, int height)
     {
-
+        extractor = new DNNExtractor();
+        faceDetector = new FaceDetector("placeholder"); //todo: add haarcascades files
+        try {
+            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
+        } catch(Exception e) {}
     }
 
     @Override
@@ -106,7 +119,14 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
     {
-        Mat frameMat = inputFrame.rgba();
+        Mat frameMat = adjustMatOrientation(inputFrame.rgba());
+        //todo: process with face recognition
+        //todo: draw stuff on it
+        return frameMat;
+    }
+
+    private Mat adjustMatOrientation(Mat frameMat)
+    {
         int degrees = -1 * getOrientationDegrees();
         if(degrees != 0) //check for potrait mode
         {
@@ -125,7 +145,8 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
         int rotation = this.getWindowManager().getDefaultDisplay()
                 .getRotation();
         int degrees = 0;
-        switch (rotation) {
+        switch (rotation)
+        {
             case Surface.ROTATION_0: degrees = 90; break;
             case Surface.ROTATION_90: degrees = 0; break;
             case Surface.ROTATION_180: degrees = 270; break;
