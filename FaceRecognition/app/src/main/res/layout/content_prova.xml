@@ -8,4 +8,10 @@
     tools:context=".ProvaActivity"
     tools:showIn="@layout/activity_prova">
 
+    <ImageView
+        android:id="@+id/bludraw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/blus"/>
+
 </android.support.constraint.ConstraintLayout>

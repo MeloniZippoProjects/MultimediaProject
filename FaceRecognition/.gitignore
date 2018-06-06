@@ -5,6 +5,8 @@
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/caches/
+/.idea/assetWizardSettings.xml
+/app/libs_not_used
 .DS_Store
 /build
 /captures
