@@ -19,6 +19,7 @@ import org.opencv.android.JavaCameraView;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
+import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -27,6 +28,7 @@ import org.opencv.core.Core;
 import java.io.File;
 
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -103,7 +105,8 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     public void onCameraViewStarted(int width, int height)
     {
-        extractor = new DNNExtractor();
+        //todo: modify constructor to accept File instead of reading from Parameter
+        //extractor = new DNNExtractor();
         faceDetector = new FaceDetector(
                 InternalStorageFiles.getFile(
                         InternalStorageFiles.HAARCASCADE_FRONTALFACE)
@@ -126,6 +129,18 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
         Mat frameMat = adjustMatOrientation(inputFrame.rgba());
         //todo: process with face recognition
         //todo: draw stuff on it
+
+        MatOfRect faces = faceDetector.detect(frameMat, Parameters.FACE_MIN_SIZE, Parameters.FACE_MAX_SIZE);
+
+        Mat outputMat = printFaceBoxesOnMat(frameMat, faces);
+
+        return outputMat;
+    }
+
+    private Mat printFaceBoxesOnMat(Mat frameMat, MatOfRect faces)
+    {
+        //todo: implement this
+
         return frameMat;
     }
 
