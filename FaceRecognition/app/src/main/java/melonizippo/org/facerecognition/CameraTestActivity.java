@@ -104,10 +104,14 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     public void onCameraViewStarted(int width, int height)
     {
         extractor = new DNNExtractor();
-        faceDetector = new FaceDetector("placeholder"); //todo: add haarcascades files
-        try {
-            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
-        } catch(Exception e) {}
+        faceDetector = new FaceDetector(
+                InternalStorageFiles.getFile(
+                        InternalStorageFiles.HAARCASCADE_FRONTALFACE)
+                        .getPath()); //todo: add haarcascades files
+
+//        try {
+//            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
+//        } catch(Exception e) {}
     }
 
     @Override

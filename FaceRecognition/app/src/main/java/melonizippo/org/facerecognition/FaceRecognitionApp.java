@@ -40,7 +40,7 @@ public class FaceRecognitionApp extends Application {
             //String filepath = InternalStorageFiles.getAssetPath(InternalStorageFiles.HAARCASCADE_FRONTALFACE);
             for(int fileId : filesToCopy)
             {
-                copyToInternalStorage(fileId);
+                InternalStorageFiles.copyToInternalStorage(fileId);
             }
         }
         catch(IOException ex)
@@ -54,36 +54,4 @@ public class FaceRecognitionApp extends Application {
         InternalStorageFiles.setAssetManager(assetManager);
         InternalStorageFiles.setInternalStorage(internalStorage);
     }
-
-    private void copyToInternalStorage(int fileId) throws IOException
-    {
-        File targetFile = InternalStorageFiles.getFile(fileId);
-
-        //create the parent directories if they do not exist yet
-        File parentDirectory = targetFile.getParentFile();
-        if(!parentDirectory.exists())
-        {
-            if(!parentDirectory.mkdirs())
-            {
-                Log.e(TAG, "Cannot create parent directories");
-                throw new IOException();
-            }
-        }
-
-        //copy the asset in the target file
-        try(InputStream inputStream = getAssets().open(InternalStorageFiles.getAssetPath(fileId)))
-        {
-            try(FileOutputStream outputStream = new FileOutputStream(targetFile))
-            {
-                byte[] buffer = new byte[8 * 1024];
-                int bytesRead;
-                while((bytesRead = inputStream.read(buffer)) != -1)
-                {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            }
-        }
-    }
-
-
 }
