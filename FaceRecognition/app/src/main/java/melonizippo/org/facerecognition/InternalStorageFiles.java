@@ -17,7 +17,7 @@ public class InternalStorageFiles {
 
     public static final int HAARCASCADE_FRONTALFACE = 0;
     public static final int VGG_PROTOTXT = 1;
-    public static final int VGG_MODEL = 2;
+    public static final int VGG_CAFFE_MODEL = 2;
 
     public static AssetManager assetManager;
     public static File internalStorage;
@@ -51,7 +51,7 @@ public class InternalStorageFiles {
             case VGG_PROTOTXT:
                 path = "caffe_model/senet50_ft_caffe/senet50_ft.prototxt";
                 break;
-            case VGG_MODEL:
+            case VGG_CAFFE_MODEL:
                 path = "caffe_model/senet50_ft_caffe/senet50_ft.caffemodel";
                 break;
             default:

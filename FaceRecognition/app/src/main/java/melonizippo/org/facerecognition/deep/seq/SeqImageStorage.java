@@ -13,7 +13,7 @@ public class SeqImageStorage {
 	private	DNNExtractor extractor;
 
 	public SeqImageStorage() {
-		extractor = new DNNExtractor();
+		//extractor = new DNNExtractor();
 	}
 
 /*

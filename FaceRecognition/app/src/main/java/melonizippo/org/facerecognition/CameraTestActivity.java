@@ -64,8 +64,11 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String permissions[],
+            int[] grantResults)
+    {
         switch (requestCode) {
             case PERMISSION_CAMERA: {
                 if (grantResults.length > 0
@@ -107,8 +110,11 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     public void onCameraViewStarted(int width, int height)
     {
-        //todo: modify constructor to accept File instead of reading from Parameter
-        //extractor = new DNNExtractor();
+        extractor = new DNNExtractor(
+                InternalStorageFiles.getFile(InternalStorageFiles.VGG_PROTOTXT),
+                InternalStorageFiles.getFile(InternalStorageFiles.VGG_CAFFE_MODEL)
+        );
+
         faceDetector = new FaceDetector(
                 InternalStorageFiles.getFile(
                         InternalStorageFiles.HAARCASCADE_FRONTALFACE)

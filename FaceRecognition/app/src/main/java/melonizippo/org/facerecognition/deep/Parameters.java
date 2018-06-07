@@ -10,7 +10,7 @@ public class Parameters {
 	public static final String DEEP_PROTO = "data/caffe/LightenedCNN_A_deploy.prototxt";
 	public static final String DEEP_MODEL = "data/caffe/LightenedCNN_A.caffemodel";
 	
-	public static final String DEEP_LAYER = "fc1";
+	public static final String DEEP_LAYER = "pool5/7x7_s1";
 	public static final int IMG_WIDTH = 128;
 	public static final int IMG_HEIGHT = 128;
 	

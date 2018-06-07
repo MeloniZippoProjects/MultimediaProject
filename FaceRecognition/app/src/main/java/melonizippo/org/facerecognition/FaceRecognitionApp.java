@@ -8,11 +8,7 @@ import android.util.Log;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 public class FaceRecognitionApp extends Application {
 
@@ -21,7 +17,7 @@ public class FaceRecognitionApp extends Application {
     private final static Integer[] filesToCopy = {
             InternalStorageFiles.HAARCASCADE_FRONTALFACE,
             InternalStorageFiles.VGG_PROTOTXT,
-            InternalStorageFiles.VGG_MODEL
+            InternalStorageFiles.VGG_CAFFE_MODEL
     };
 
     @Override
