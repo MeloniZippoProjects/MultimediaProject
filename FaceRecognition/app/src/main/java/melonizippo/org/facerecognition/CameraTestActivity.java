@@ -1,11 +1,7 @@
 package melonizippo.org.facerecognition;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,20 +10,14 @@ import android.util.Log;
 import android.view.Surface;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCamera2View;
 import org.opencv.android.JavaCameraView;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.core.Core;
-
-import java.io.File;
 
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
@@ -140,9 +130,25 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
 
         MatOfRect faces = faceDetector.detect(frameMat, Parameters.FACE_MIN_SIZE, Parameters.FACE_MAX_SIZE);
 
+        classifyFaces(frameMat, faces);
+
+        //todo: if intruder, send alarm and store it
+
         Mat outputMat = printFaceBoxesOnMat(frameMat, faces);
 
         return outputMat;
+    }
+
+    //todo: define proper return type
+    private void classifyFaces(Mat frameMat, MatOfRect faces)
+    {
+        for(Rect face : faces.toArray())
+        {
+            Mat faceMat = frameMat.submat(face);
+            float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
+
+            //todo: classify with knn
+        }
     }
 
     private Mat printFaceBoxesOnMat(Mat frameMat, MatOfRect faces)
