@@ -21,6 +21,8 @@ import org.opencv.core.Mat;
 
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Core;
@@ -139,9 +141,15 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
 
     private Mat printFaceBoxesOnMat(Mat frameMat, MatOfRect faces)
     {
-        //todo: implement this
+        Mat outputMat = frameMat.clone();
+        for(Rect rect : faces.toArray())
+        {
+            Point p1 = rect.tl();
+            Point p2 = rect.br();
+            Imgproc.rectangle(outputMat, p1, p2, new Scalar(0, 0, 255), 5);
+        }
 
-        return frameMat;
+        return outputMat;
     }
 
     private Mat adjustMatOrientation(Mat frameMat)
