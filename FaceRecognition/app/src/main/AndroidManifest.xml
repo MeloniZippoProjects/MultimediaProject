@@ -20,7 +20,7 @@
         <activity
             android:name=".ImageMatTestActivity"
             android:label="@string/title_activity_prova"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".FaceRecognitionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +31,10 @@
         <activity
             android:name=".IdentitiesEditorActivity"
             android:label="@string/title_activity_identities_editor"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".AddIdentityActivity"
+            android:label="@string/title_activity_add_identity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

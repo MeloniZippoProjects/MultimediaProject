@@ -1,5 +1,6 @@
 package melonizippo.org.facerecognition;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -29,8 +30,8 @@ public class IdentitiesEditorActivity extends AppCompatActivity
         {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(IdentitiesEditorActivity.this, AddIdentityActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -41,7 +42,7 @@ public class IdentitiesEditorActivity extends AppCompatActivity
     {
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         TextView textView = findViewById(R.id.TextView);
-        String text = db.KnownIdentities.size() + " known identities:\n";
+        String text = db.KnownIdentities.size() + "known identities:\n";
         for(IdentityEntry ie : db.KnownIdentities)
         {
             text += "Label: " + ie.Label +
@@ -50,5 +51,4 @@ public class IdentitiesEditorActivity extends AppCompatActivity
         }
         textView.setText(text);
     }
-
 }

@@ -122,7 +122,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         faceDetector = new FaceDetector(
                 InternalStorageFiles.getFile(
                         InternalStorageFiles.HAARCASCADE_FRONTALFACE)
-                        .getPath()); //todo: add haarcascades files
+                        .getPath());
 
 //        try {
 //            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
@@ -159,8 +159,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         for(Rect face : faces.toArray())
         {
             Mat faceMat = frameMat.submat(face);
-            //bug: this causes crash
-            //float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
+            float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
 
             //todo: classify with knn
         }
