@@ -10,6 +10,8 @@ import org.opencv.android.OpenCVLoader;
 import java.io.File;
 import java.io.IOException;
 
+import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
+
 public class FaceRecognitionApp extends Application {
 
     private final static String TAG = "FaceRecognitionApp";
@@ -31,9 +33,10 @@ public class FaceRecognitionApp extends Application {
         //initialize internal storage with assets and internal storage dir
         initInternalStorage(getAssets(), getFilesDir());
 
-        //let's test with one file
-        try {
-            //String filepath = InternalStorageFiles.getAssetPath(InternalStorageFiles.HAARCASCADE_FRONTALFACE);
+        FaceDatabaseStorage.setFileStorage(getFilesDir());
+
+        try
+        {
             for(int fileId : filesToCopy)
             {
                 InternalStorageFiles.copyToInternalStorage(fileId);
