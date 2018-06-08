@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ProvaActivity"
-    tools:showIn="@layout/activity_prova">
+    tools:context=".ImageMatTestActivity"
+    tools:showIn="@layout/activity_image_mat_test">
 
     <ImageView
         android:id="@+id/bludraw"

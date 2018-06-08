@@ -18,11 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ProvaActivity"
+            android:name=".ImageMatTestActivity"
             android:label="@string/title_activity_prova"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".CameraTestActivity">
+        <activity android:name=".FaceRecognitionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

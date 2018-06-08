@@ -24,7 +24,7 @@ import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
-public class CameraTestActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class FaceRecognitionActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final int PERMISSION_CAMERA = 1;
     JavaCameraView javaCameraView;
@@ -35,7 +35,7 @@ public class CameraTestActivity extends AppCompatActivity implements CameraBridg
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera_test);
+        setContentView(R.layout.activity_face_recognition);
 
         javaCameraView = findViewById(R.id.HelloOpenCvView);
         javaCameraView.setCvCameraViewListener(this);
