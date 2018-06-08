@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">FaceRecognition</string>
     <string name="title_activity_prova">ProvaActivity</string>
+    <string name="title_activity_identities_editor">IdentitiesEditorActivity</string>
 </resources>

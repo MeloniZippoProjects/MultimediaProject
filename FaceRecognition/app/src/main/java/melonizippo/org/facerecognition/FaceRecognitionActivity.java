@@ -1,13 +1,16 @@
 package melonizippo.org.facerecognition;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Surface;
+import android.view.View;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
@@ -36,6 +39,17 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.goToIdentitiesEditor);
+        fab.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesEditorActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         javaCameraView = findViewById(R.id.HelloOpenCvView);
         javaCameraView.setCvCameraViewListener(this);
@@ -145,7 +159,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         for(Rect face : faces.toArray())
         {
             Mat faceMat = frameMat.submat(face);
-            float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
+            //bug: this causes crash
+            //float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
 
             //todo: classify with knn
         }

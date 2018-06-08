@@ -20,27 +20,34 @@ public class FaceDatabaseStorage
         internalStorage = internalStorage;
     }
 
-    public static FaceDatabase load()
+    private static FaceDatabase faceDatabase;
+    public static FaceDatabase getFaceDatabase()
+    {
+        if(faceDatabase == null)
+            load();
+        return faceDatabase;
+    }
+
+    public static void load()
     {
         File dbFile = new File(internalStorage, IMAGE_DATABASE_PATH);
 
-        try(FileInputStream fis = new FileInputStream(dbFile))
+        try(
+                FileInputStream fis = new FileInputStream(dbFile);
+                ObjectInputStream ois = new ObjectInputStream(fis))
         {
-            try(ObjectInputStream ois = new ObjectInputStream(fis))
-            {
-                FaceDatabase db = (FaceDatabase) ois.readObject();
-                Log.d(TAG, "Database loaded");
-                return db;
-            }
+            FaceDatabase db = (FaceDatabase) ois.readObject();
+            Log.i(TAG, "Database loaded");
+            faceDatabase = db;
         }
         catch (Exception ex)
         {
-            Log.d(TAG, "Database loading failed");
-            return new FaceDatabase();
+            Log.i(TAG, "Database loading failed");
+            faceDatabase = new FaceDatabase();
         }
     }
 
-    public static void store(FaceDatabase database)
+    public static void store()
     {
         File dbFile = new File(internalStorage, IMAGE_DATABASE_PATH);
 
@@ -48,7 +55,7 @@ public class FaceDatabaseStorage
         {
             try(ObjectOutputStream oos = new ObjectOutputStream(fos))
             {
-                oos.writeObject(database);
+                oos.writeObject(faceDatabase);
                 Log.d(TAG, "Database stored");
             }
         }
