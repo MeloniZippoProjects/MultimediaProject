@@ -4,17 +4,18 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -42,7 +43,8 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private boolean isDefaultLabel = true;
 
-    private Uri cameraImageUri;
+    private File cameraPictureFile;
+    private Uri cameraPictureUri;
 
     private FaceDetector faceDetector;
     private DNNExtractor extractor;
@@ -125,7 +127,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
         startActivityForResult(galleryIntent, PICK_IMAGE);
     }
-
+    
     public void choosePhotosFromGallery()
     {
         Intent intent = new Intent();
@@ -138,12 +140,10 @@ public class AddIdentityActivity extends AppCompatActivity
     private void takePhotoFromCamera()
     {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        File photo;
         try
         {
             // place where to store camera taken picture
-            photo = this.createTemporaryFile("picture", ".jpg");
-            photo.delete();
+            cameraPictureFile = this.createPictureFile("picture", ".jpg");
         }
         catch(Exception e)
         {
@@ -151,21 +151,25 @@ public class AddIdentityActivity extends AppCompatActivity
             Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG);
             return;
         }
-        cameraImageUri = Uri.fromFile(photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+        cameraPictureUri = Uri.fromFile(cameraPictureFile);
+        Uri cameraPicturePublicUri = FileProvider.getUriForFile(
+                this,
+                "melonizippo.org.facerecognition",
+                cameraPictureFile
+        );
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPicturePublicUri);
+
         //start camera intent
         startActivityForResult(intent, SHOOT_IMAGE);
     }
 
-    private File createTemporaryFile(String part, String ext) throws Exception
+    private File createPictureFile(String part, String ext) throws Exception
     {
-        File tempDir= Environment.getDataDirectory();
-        tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
-        if(!tempDir.exists())
-        {
-            tempDir.mkdirs();
-        }
-        return File.createTempFile(part, ext, tempDir);
+        File picturesDir= getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String name = part + Calendar.getInstance().getTimeInMillis() + ext;
+        File pictureFile = new File(picturesDir, name);
+        pictureFile.createNewFile();
+        return pictureFile;
     }
 
     @Override
@@ -180,7 +184,7 @@ public class AddIdentityActivity extends AppCompatActivity
             }
             else if (requestCode == SHOOT_IMAGE)
             {
-                addImage(cameraImageUri);
+                addImage(cameraPictureUri);
             }
             else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
             {
