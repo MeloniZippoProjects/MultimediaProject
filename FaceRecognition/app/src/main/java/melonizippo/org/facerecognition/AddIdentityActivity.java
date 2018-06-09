@@ -55,7 +55,7 @@ public class AddIdentityActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_identity);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         faceDetector = new FaceDetector(
@@ -69,33 +69,20 @@ public class AddIdentityActivity extends AppCompatActivity
 
         faceDataAdapter = new FaceDataAdapter(faceData, getApplicationContext());
 
-        ListView previewsView = (ListView) findViewById(R.id.previewsView);
+        ListView previewsView = findViewById(R.id.previewsView);
         previewsView.setAdapter(faceDataAdapter);
 
-        FloatingActionButton addPhotosButton = (FloatingActionButton) findViewById(R.id.addPhotos);
-        addPhotosButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                showPictureDialog();
-            }
-        });
+        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotos);
+        addPhotosButton.setOnClickListener((view) -> showPictureDialog());
 
-        final TextInputEditText labelEditor = (TextInputEditText) findViewById(R.id.identityLabelField);
-        labelEditor.setOnClickListener( new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                clearPlaceholderText();
-            }
-        });
+        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
+        labelEditor.setOnClickListener(view -> clearPlaceholderText());
+        labelEditor.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
     }
 
     private void clearPlaceholderText()
     {
-        final TextInputEditText labelEditor = (TextInputEditText) findViewById(R.id.identityLabelField);
+        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
         if(isDefaultLabel)
         {
             labelEditor.setText("");
