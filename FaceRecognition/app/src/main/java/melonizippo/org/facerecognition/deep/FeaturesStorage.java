@@ -12,7 +12,7 @@ public class FeaturesStorage {
 	
 	public static void store(List<ImgDescriptor> ids, File storageFile) throws IOException {
 		if (ids != null){
-			storageFile.getParentFile().mkdir();
+			storageFile.getParentFile().mkdirs();
 	        FileOutputStream fos =  new FileOutputStream(storageFile);
 	        ObjectOutputStream oos = new ObjectOutputStream(fos);
 	        try {
