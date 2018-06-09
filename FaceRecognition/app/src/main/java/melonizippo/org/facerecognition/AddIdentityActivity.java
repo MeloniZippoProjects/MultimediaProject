@@ -1,5 +1,6 @@
 package melonizippo.org.facerecognition;
 
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,6 +37,7 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final String TAG = "AddIdentityActivity";
     private static final int PICK_IMAGE = 1;
     private static final int SHOOT_IMAGE = 2;
+    private static final int PICK_IMAGE_MULTIPLE = 3;
 
     private Uri cameraImageUri;
 
@@ -83,6 +85,7 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
                 "Select photo from gallery",
+                "Select multiple photos from gallery",
                 "Capture photo from camera" };
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
@@ -93,6 +96,9 @@ public class AddIdentityActivity extends AppCompatActivity
                                 choosePhotoFromGallery();
                                 break;
                             case 1:
+                                choosePhotosFromGallery();
+                                break;
+                            case 2:
                                 takePhotoFromCamera();
                                 break;
                         }
@@ -105,9 +111,18 @@ public class AddIdentityActivity extends AppCompatActivity
     {
         Intent galleryIntent = new Intent(
                 Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 
         startActivityForResult(galleryIntent, PICK_IMAGE);
+    }
+
+    public void choosePhotosFromGallery()
+    {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
     }
 
     private void takePhotoFromCamera()
@@ -146,9 +161,9 @@ public class AddIdentityActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(resultCode == RESULT_OK)
+        if(resultCode == RESULT_OK )
         {
-            if (requestCode == PICK_IMAGE)
+            if (requestCode == PICK_IMAGE && data != null)
             {
                 Uri imageUri = data.getData();
                 addImage(imageUri);
@@ -156,6 +171,26 @@ public class AddIdentityActivity extends AppCompatActivity
             else if (requestCode == SHOOT_IMAGE)
             {
                 addImage(cameraImageUri);
+            }
+            else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
+            {
+                if( data.getData() != null )
+                {
+                    Uri imageUri = data.getData();
+                    addImage(imageUri);
+                }
+                else
+                {
+                    if (data.getClipData() != null) {
+                        ClipData clipData = data.getClipData();
+                        for (int i = 0; i < clipData.getItemCount(); i++)
+                        {
+                            ClipData.Item item = clipData.getItemAt(i);
+                            Uri imageUri = item.getUri();
+                            addImage(imageUri);
+                        }
+                    }
+                }
             }
         }
     }
