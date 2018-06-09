@@ -33,6 +33,7 @@ import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
 public class AddIdentityActivity extends AppCompatActivity
 {
@@ -46,11 +47,12 @@ public class AddIdentityActivity extends AppCompatActivity
     private File cameraPictureFile;
     private Uri cameraPictureUri;
 
-    private FaceDetector faceDetector;
-    private DNNExtractor extractor;
-
     private List<FaceData> faceData = new ArrayList<>();
     private static FaceDataAdapter faceDataAdapter;
+
+    private FaceDetector faceDetector;
+    private DNNExtractor extractor;
+    private KNNClassifier knnClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,14 +62,10 @@ public class AddIdentityActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        faceDetector = new FaceDetector(
-                InternalStorageFiles.getFile(
-                        InternalStorageFiles.HAARCASCADE_FRONTALFACE)
-                        .getPath());
-        extractor = new DNNExtractor(
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_PROTOTXT),
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_CAFFE_MODEL)
-        );
+        FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
+        faceDetector = app.faceDetector;
+        extractor = app.extractor;
+        knnClassifier = app.knnClassifier;
 
         faceDataAdapter = new FaceDataAdapter(faceData, getApplicationContext());
 
