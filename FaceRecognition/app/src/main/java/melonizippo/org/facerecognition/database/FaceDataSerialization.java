@@ -11,7 +11,7 @@ public class FaceDataSerialization implements Serializable
     public int type;
     public byte[] bytes;
 
-    public float[] Features;
+    public float[] features;
 
     public void serializeMat(Mat mat)
     {

@@ -3,7 +3,6 @@ package melonizippo.org.facerecognition;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -42,12 +41,12 @@ public class IdentitiesEditorActivity extends AppCompatActivity
     {
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         TextView textView = findViewById(R.id.TextView);
-        String text = db.KnownIdentities.size() + "known identities:\n";
-        for(IdentityEntry ie : db.KnownIdentities)
+        String text = db.knownIdentities.size() + "known identities:\n";
+        for(IdentityEntry ie : db.knownIdentities)
         {
-            text += "Label: " + ie.Label +
-                    ", authorized: " + ie.Authorized +
-                    ", photos: " + ie.IdentityDataset.size() + "\n";
+            text += "Label: " + ie.label +
+                    ", authorized: " + ie.authorized +
+                    ", photos: " + ie.identityDataset.size() + "\n";
         }
         textView.setText(text);
     }

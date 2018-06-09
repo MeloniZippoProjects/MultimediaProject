@@ -12,14 +12,14 @@ import org.opencv.core.Mat;
 
 public class FaceData implements Serializable
 {
-    public Mat FaceMat;
-    public float[] Features;
+    public Mat faceMat;
+    public float[] features;
 
     //Bitmap conversion
     public Bitmap toBitmap()
     {
-        Bitmap bitmap = Bitmap.createBitmap( FaceMat.cols(), FaceMat.rows(), Bitmap.Config.RGB_565);
-        Utils.matToBitmap(FaceMat, bitmap);
+        Bitmap bitmap = Bitmap.createBitmap( faceMat.cols(), faceMat.rows(), Bitmap.Config.RGB_565);
+        Utils.matToBitmap(faceMat, bitmap);
         return bitmap;
     }
 
@@ -27,8 +27,8 @@ public class FaceData implements Serializable
     private void writeObject(ObjectOutputStream oos) throws IOException
     {
         FaceDataSerialization fds = new FaceDataSerialization();
-        fds.Features = Features;
-        fds.serializeMat(FaceMat);
+        fds.features = features;
+        fds.serializeMat(faceMat);
 
         oos.writeObject(fds);
     }
@@ -37,7 +37,7 @@ public class FaceData implements Serializable
             throws ClassNotFoundException, IOException
     {
         FaceDataSerialization fds = (FaceDataSerialization) ois.readObject();
-        Features = fds.Features;
-        FaceMat = fds.deserializeMat();
+        features = fds.features;
+        faceMat = fds.deserializeMat();
     }
 }

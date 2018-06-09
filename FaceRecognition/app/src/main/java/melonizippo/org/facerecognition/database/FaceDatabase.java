@@ -6,8 +6,8 @@ import java.util.List;
 
 public class FaceDatabase implements Serializable
 {
-    public List<IdentityEntry> KnownIdentities = new ArrayList<>();
-    public List<FaceData> UncategorizedData = new ArrayList<>();
+    public List<IdentityEntry> knownIdentities = new ArrayList<>();
+    public List<FaceData> uncategorizedData = new ArrayList<>();
 
     //todo: still discussed about
     //public List<IdentityEntry> SuggestedIdentities;

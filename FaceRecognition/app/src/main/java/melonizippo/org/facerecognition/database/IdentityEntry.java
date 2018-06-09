@@ -5,7 +5,7 @@ import java.util.List;
 
 public class IdentityEntry implements Serializable
 {
-    public String Label;
-    public boolean Authorized;
-    public List<FaceData> IdentityDataset;
+    public String label;
+    public boolean authorized;
+    public List<FaceData> identityDataset;
 }
