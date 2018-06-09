@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_add_identity">
 
     <android.support.design.widget.TextInputEditText
-        android:id="@+id/textInputEditText3"
+        android:id="@+id/identityLabelField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,6 +39,8 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final int PICK_IMAGE = 1;
     private static final int SHOOT_IMAGE = 2;
     private static final int PICK_IMAGE_MULTIPLE = 3;
+
+    private boolean isDefaultLabel = true;
 
     private Uri cameraImageUri;
 
@@ -78,6 +81,26 @@ public class AddIdentityActivity extends AppCompatActivity
                 showPictureDialog();
             }
         });
+
+        final TextInputEditText labelEditor = (TextInputEditText) findViewById(R.id.identityLabelField);
+        labelEditor.setOnClickListener( new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                clearPlaceholderText();
+            }
+        });
+    }
+
+    private void clearPlaceholderText()
+    {
+        final TextInputEditText labelEditor = (TextInputEditText) findViewById(R.id.identityLabelField);
+        if(isDefaultLabel)
+        {
+            labelEditor.setText("");
+            isDefaultLabel = false;
+        }
     }
 
     private void showPictureDialog(){
