@@ -38,7 +38,7 @@ public class FaceRecognitionApp extends Application {
         OpenCVLoader.initDebug();
 
         //initialize internal storage with assets and internal storage dir
-        initInternalStorage(getAssets(), getFilesDir());
+        initInternalStorage(getAssets(), getCacheDir());
         FaceDatabaseStorage.setFileStorage(getFilesDir());
 
         copyFiles();
