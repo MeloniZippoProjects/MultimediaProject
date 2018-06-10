@@ -50,13 +50,13 @@ public class InternalStorageFiles {
                 break;
             case VGG_PROTOTXT:
                 //path = "caffe_model/senet50_ft_caffe/senet50_ft.prototxt";
-                path = "caffe_model/resnet50_ft_caffe/resnet50_ft.prototxt";
-                //path = "caffe_model/light/LightenedCNN_A.prototxt";
+                //path = "caffe_model/resnet50_ft_caffe/resnet50_ft.prototxt";
+                path = "caffe_model/light/LightenedCNN_A.prototxt";
                 break;
             case VGG_CAFFE_MODEL:
                 //path = "caffe_model/senet50_ft_caffe/senet50_ft.caffemodel";
-                path = "caffe_model/resnet50_ft_caffe/resnet50_ft.caffemodel";
-                //path = "caffe_model/light/LightenedCNN_A.caffemodel";
+                //path = "caffe_model/resnet50_ft_caffe/resnet50_ft.caffemodel";
+                path = "caffe_model/light/LightenedCNN_A.caffemodel";
                 break;
             default:
                 path = "";
