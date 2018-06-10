@@ -51,13 +51,16 @@ public class FaceDatabaseStorage
     {
         File dbFile = new File(internalStorage, IMAGE_DATABASE_PATH);
 
-        try(FileOutputStream fos = new FileOutputStream(dbFile))
+        try(
+            FileOutputStream fos = new FileOutputStream(dbFile);
+            ObjectOutputStream oos = new ObjectOutputStream(fos)
+        )
         {
-            try(ObjectOutputStream oos = new ObjectOutputStream(fos))
-            {
-                oos.writeObject(faceDatabase);
-                Log.d(TAG, "Database stored");
-            }
+            if(!dbFile.exists())
+                dbFile.createNewFile();
+
+            oos.writeObject(faceDatabase);
+            Log.d(TAG, "Database stored");
         }
         catch (Exception ex)
         {

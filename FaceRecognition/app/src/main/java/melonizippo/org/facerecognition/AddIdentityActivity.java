@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -73,7 +74,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
         faceDataAdapter = new FaceDataAdapter(faceData, getApplicationContext());
 
-        ListView previewsView = findViewById(R.id.previewsView);
+        GridView previewsView = findViewById(R.id.previewsView);
         previewsView.setAdapter(faceDataAdapter);
 
         FloatingActionButton addPhotosButton = findViewById(R.id.addPhotos);
@@ -217,8 +218,10 @@ public class AddIdentityActivity extends AppCompatActivity
                 {
                     if (data.getClipData() != null) {
                         ClipData clipData = data.getClipData();
-                        for (int i = 0; i < clipData.getItemCount(); i++)
+                        int itemCount = clipData.getItemCount();
+                        for (int i = 0; i < itemCount; i++)
                         {
+                            Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
                             ClipData.Item item = clipData.getItemAt(i);
                             Uri imageUri = item.getUri();
                             addImage(imageUri);
@@ -266,6 +269,8 @@ public class AddIdentityActivity extends AppCompatActivity
             return;
 
         }
+
+        Log.i(TAG, "Face detected, adding to dataset");
 
         Rect faceRect = faces[0];
 
