@@ -130,11 +130,11 @@ public class AddIdentityActivity extends AppCompatActivity
         //todo: add checks for duplicate feature, already existing label, enough images...
 
         IdentityEntry identityEntry = new IdentityEntry();
-        identityEntry.Label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString();
-        identityEntry.Authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
-        identityEntry.IdentityDataset = new ArrayList<>(faceData);
+        identityEntry.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString();
+        identityEntry.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
+        identityEntry.identityDataset = new ArrayList<>(faceData);
 
-        FaceDatabaseStorage.getFaceDatabase().KnownIdentities.add(identityEntry);
+        FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identityEntry);
         FaceDatabaseStorage.store();
 
         //should clear or exit the activity?
@@ -248,7 +248,7 @@ public class AddIdentityActivity extends AppCompatActivity
         Mat imageMat = new Mat();
         Utils.bitmapToMat(imageBitmap, imageMat);
 
-        MatOfRect facesMat = faceDetector.detect(imageMat, Parameters.FACE_MIN_SIZE, Parameters.FACE_MAX_SIZE);
+        MatOfRect facesMat = faceDetector.detect(imageMat);
         Rect[] faces = facesMat.toArray();
 
         //bug: for some reason, it's always more than 1 face
@@ -276,7 +276,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
         FaceData fd = new FaceData();
         fd.faceMat = imageMat.submat(faceRect);
-        fd.features = extractor.extract(fd.faceMat, Parameters.DEEP_LAYER);
+        fd.features = extractor.extract(fd.faceMat);
 
         faceData.add(fd);
         faceDataAdapter.notifyDataSetChanged();
