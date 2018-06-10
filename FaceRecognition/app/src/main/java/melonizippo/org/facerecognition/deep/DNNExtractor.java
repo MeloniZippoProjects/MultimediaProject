@@ -23,6 +23,7 @@ public class DNNExtractor {
 	private Net net;
 	private Size imgSize;
 	private Scalar mean;
+	private String layer;
 	
 	public DNNExtractor(
 		File protoTxt,
@@ -31,26 +32,30 @@ public class DNNExtractor {
 	{
 		net = readNetFromCaffe(protoTxt.getPath(), caffeModel.getPath());
         imgSize = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
-		mean = new Scalar(91.4953, 103.8827, 131.0912);
+		mean = Parameters.MEAN;
+		layer = Parameters.DEEP_LAYER;
 	}
 
-	public float[] extract(File image, String layer) {
+	public float[] extract(File image) {
 		Mat img = imread(image.getPath());
-		return extract(img, layer);
+		return extract(img);
 	}
 
     //todo: verify correctness of this implementation porting
-    public float[] extract(Mat img, String layer)
+    public float[] extract(Mat img)
 	{
 		//temp workaround to avoid runtime crashes
 		//return new float[]{0.0f, 1.1f, 3.5f};
 
 		//test
 		Mat converted = new Mat();
-		Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2BGR);
 
-		//Size imgSize = new Size(224, 224);
-		//Scalar mean = new Scalar(0);
+		//when using resnet the mat must be bgr
+		//Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2BGR);
+
+		//when using lightened the mat can be rgba (or bgra?)
+		converted = img.clone();
+
 		Mat inputBlob = blobFromImage(converted, 1.0, imgSize, mean, false, false); // Convert Mat to dnn::Blob image batch
 
 		net.setInput(inputBlob, "data"); // set the network input

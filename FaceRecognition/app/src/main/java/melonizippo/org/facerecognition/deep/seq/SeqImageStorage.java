@@ -40,7 +40,7 @@ public class SeqImageStorage {
 				System.out.println(counter++ + " - extracting " + imgFile.getName());
 				try {
 					long time = -System.currentTimeMillis();
-					float[] features = extractor.extract(imgFile, Parameters.DEEP_LAYER);
+					float[] features = extractor.extract(imgFile);
 					time += System.currentTimeMillis();
 					System.out.println(time);
 					descs.add(new ImgDescriptor(features, imgFile.getName(), imgFile.getParentFile().getName()));

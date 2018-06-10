@@ -5,11 +5,18 @@ import org.opencv.core.MatOfRect;
 import org.opencv.core.Size;
 import org.opencv.objdetect.CascadeClassifier;
 
+import melonizippo.org.facerecognition.deep.Parameters;
+
 public class FaceDetector {
 
-	public static final int CV_HAAR_DO_CANNY_PRUNING = 1;
-
 	private CascadeClassifier face_cascade;
+
+	private static double scaleFactor = Parameters.SCALE_FACTOR;
+	private static int minNeighbors = Parameters.MIN_NEIGHBORS;
+	private static int cannyPruning = Parameters.CANNY_PRUNING;
+	private static Size minSize = Parameters.FACE_MIN_SIZE;
+	private static Size maxSize = Parameters.FACE_MAX_SIZE;
+
 
 	//TODO
 	public FaceDetector(String haarcascadePath) {
@@ -19,10 +26,9 @@ public class FaceDetector {
 	}
 
 	//TODO
-	public MatOfRect detect(Mat img, Size minSize, Size maxSize) {
+	public MatOfRect detect(Mat img) {
 		//detect faces
 		MatOfRect rectVector = new MatOfRect();
-		face_cascade.detectMultiScale(img, rectVector, 1.2, 3, CV_HAAR_DO_CANNY_PRUNING, minSize, maxSize);
-		return rectVector;
+		face_cascade.detectMultiScale(img, rectVector, scaleFactor, minNeighbors, cannyPruning, minSize, maxSize);		return rectVector;
 	}
 }
