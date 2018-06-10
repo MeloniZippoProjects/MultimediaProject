@@ -194,7 +194,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
     private Mat adjustMatOrientation(Mat frameMat)
     {
-        int degrees = -1 * getOrientationDegrees();
+        int degrees = getOrientationDegrees();
         if(degrees != 0) //check for potrait mode
         {
             Mat rotationMat = Imgproc.getRotationMatrix2D(new Point(frameMat.width() / 2, frameMat.height() / 2), degrees, 1);
@@ -221,7 +221,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
             case Surface.ROTATION_270: degrees = 180; break;
         }
 
-        if(currentCamera == CAMERA_FRONT)
+        if(currentCamera == CAMERA_BACK)
             degrees *= -1;
 
         return degrees;
