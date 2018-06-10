@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="melonizippo.org.facerecognition">
+    package="melonizippo.org.facerecognition"
+    android:installLocation="preferExternal">
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -17,6 +18,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="melonizippo.org.facerecognition"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
         <activity
             android:name=".ImageMatTestActivity"
             android:label="@string/title_activity_prova"
@@ -37,5 +49,4 @@
             android:label="@string/title_activity_add_identity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
-
 </manifest>

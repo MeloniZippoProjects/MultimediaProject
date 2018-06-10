@@ -1,18 +1,24 @@
 package melonizippo.org.facerecognition;
 
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,55 +33,69 @@ import java.util.ArrayList;
 import java.util.List;
 
 import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
+import melonizippo.org.facerecognition.database.IdentityEntry;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
 public class AddIdentityActivity extends AppCompatActivity
 {
     private static final String TAG = "AddIdentityActivity";
     private static final int PICK_IMAGE = 1;
     private static final int SHOOT_IMAGE = 2;
+    private static final int PICK_IMAGE_MULTIPLE = 3;
 
-    private Uri cameraImageUri;
+    private boolean isDefaultLabel = true;
 
-    private FaceDetector faceDetector;
-    private DNNExtractor extractor;
+    private File cameraPictureFile;
+    private Uri cameraPictureUri;
 
     private List<FaceData> faceData = new ArrayList<>();
     private static FaceDataAdapter faceDataAdapter;
+
+    private FaceDetector faceDetector;
+    private DNNExtractor extractor;
+    private KNNClassifier knnClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_identity);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        faceDetector = new FaceDetector(
-                InternalStorageFiles.getFile(
-                        InternalStorageFiles.HAARCASCADE_FRONTALFACE)
-                        .getPath());
-        extractor = new DNNExtractor(
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_PROTOTXT),
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_CAFFE_MODEL)
-        );
+        FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
+        faceDetector = app.faceDetector;
+        extractor = app.extractor;
+        knnClassifier = app.knnClassifier;
 
         faceDataAdapter = new FaceDataAdapter(faceData, getApplicationContext());
 
-        ListView previewsView = (ListView) findViewById(R.id.previewsView);
+        GridView previewsView = findViewById(R.id.previewsView);
         previewsView.setAdapter(faceDataAdapter);
 
-        FloatingActionButton addPhotosButton = (FloatingActionButton) findViewById(R.id.addPhotos);
-        addPhotosButton.setOnClickListener(new View.OnClickListener()
+        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotos);
+        addPhotosButton.setOnClickListener((view) -> showPictureDialog());
+
+        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
+        labelEditor.setOnClickListener(view -> clearPlaceholderText());
+        labelEditor.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
+
+        final Button commitButton = findViewById(R.id.commitButton);
+        commitButton.setOnClickListener(view -> commitAddIdentity());
+    }
+
+    private void clearPlaceholderText()
+    {
+        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
+        if(isDefaultLabel)
         {
-            @Override
-            public void onClick(View view)
-            {
-                showPictureDialog();
-            }
-        });
+            labelEditor.setText("");
+            isDefaultLabel = false;
+        }
     }
 
     private void showPictureDialog(){
@@ -83,6 +103,7 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
                 "Select photo from gallery",
+                "Select multiple photos from gallery",
                 "Capture photo from camera" };
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
@@ -93,6 +114,9 @@ public class AddIdentityActivity extends AppCompatActivity
                                 choosePhotoFromGallery();
                                 break;
                             case 1:
+                                choosePhotosFromGallery();
+                                break;
+                            case 2:
                                 takePhotoFromCamera();
                                 break;
                         }
@@ -101,24 +125,46 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.show();
     }
 
+    private void commitAddIdentity()
+    {
+        //todo: add checks for duplicate feature, already existing label, enough images...
+
+        IdentityEntry identityEntry = new IdentityEntry();
+        identityEntry.Label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString();
+        identityEntry.Authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
+        identityEntry.IdentityDataset = new ArrayList<>(faceData);
+
+        FaceDatabaseStorage.getFaceDatabase().KnownIdentities.add(identityEntry);
+        FaceDatabaseStorage.store();
+
+        //should clear or exit the activity?
+    }
+
     public void choosePhotoFromGallery()
     {
         Intent galleryIntent = new Intent(
                 Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 
         startActivityForResult(galleryIntent, PICK_IMAGE);
+    }
+    
+    public void choosePhotosFromGallery()
+    {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
     }
 
     private void takePhotoFromCamera()
     {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        File photo;
         try
         {
             // place where to store camera taken picture
-            photo = this.createTemporaryFile("picture", ".jpg");
-            photo.delete();
+            cameraPictureFile = this.createPictureFile("picture", ".jpg");
         }
         catch(Exception e)
         {
@@ -126,36 +172,62 @@ public class AddIdentityActivity extends AppCompatActivity
             Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG);
             return;
         }
-        cameraImageUri = Uri.fromFile(photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+        cameraPictureUri = Uri.fromFile(cameraPictureFile);
+        Uri cameraPicturePublicUri = FileProvider.getUriForFile(
+                this,
+                "melonizippo.org.facerecognition",
+                cameraPictureFile
+        );
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPicturePublicUri);
+
         //start camera intent
         startActivityForResult(intent, SHOOT_IMAGE);
     }
 
-    private File createTemporaryFile(String part, String ext) throws Exception
+    private File createPictureFile(String part, String ext) throws Exception
     {
-        File tempDir= Environment.getDataDirectory();
-        tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
-        if(!tempDir.exists())
-        {
-            tempDir.mkdirs();
-        }
-        return File.createTempFile(part, ext, tempDir);
+        File picturesDir= getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        String name = part + Calendar.getInstance().getTimeInMillis() + ext;
+        File pictureFile = new File(picturesDir, name);
+        pictureFile.createNewFile();
+        return pictureFile;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(resultCode == RESULT_OK)
+        if(resultCode == RESULT_OK )
         {
-            if (requestCode == PICK_IMAGE)
+            if (requestCode == PICK_IMAGE && data != null)
             {
                 Uri imageUri = data.getData();
                 addImage(imageUri);
             }
             else if (requestCode == SHOOT_IMAGE)
             {
-                addImage(cameraImageUri);
+                addImage(cameraPictureUri);
+            }
+            else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
+            {
+                if( data.getData() != null )
+                {
+                    Uri imageUri = data.getData();
+                    addImage(imageUri);
+                }
+                else
+                {
+                    if (data.getClipData() != null) {
+                        ClipData clipData = data.getClipData();
+                        int itemCount = clipData.getItemCount();
+                        for (int i = 0; i < itemCount; i++)
+                        {
+                            Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
+                            ClipData.Item item = clipData.getItemAt(i);
+                            Uri imageUri = item.getUri();
+                            addImage(imageUri);
+                        }
+                    }
+                }
             }
         }
     }
@@ -198,6 +270,8 @@ public class AddIdentityActivity extends AppCompatActivity
 
         }
 
+        Log.i(TAG, "Face detected, adding to dataset");
+
         Rect faceRect = faces[0];
 
         FaceData fd = new FaceData();
@@ -206,17 +280,5 @@ public class AddIdentityActivity extends AppCompatActivity
 
         faceData.add(fd);
         faceDataAdapter.notifyDataSetChanged();
-    }
-
-    public class FaceDataPreview
-    {
-        public FaceData faceData;
-        public Bitmap preview;
-
-        public FaceDataPreview(FaceData fd)
-        {
-            faceData = fd;
-            preview = fd.toBitmap();
-        }
     }
 }

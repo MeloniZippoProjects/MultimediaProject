@@ -31,14 +31,20 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
     private static final int PERMISSION_CAMERA = 1;
     JavaCameraView javaCameraView;
-    private DNNExtractor extractor;
-    private FaceDetector faceDetector;
-    private KNNClassifier knnClassifier;
+
+    public FaceDetector faceDetector;
+    public DNNExtractor extractor;
+    public KNNClassifier knnClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
+
+        FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
+        faceDetector = app.faceDetector;
+        extractor = app.extractor;
+        knnClassifier = app.knnClassifier;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.goToIdentitiesEditor);
         fab.setOnClickListener(new View.OnClickListener()
@@ -49,7 +55,6 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
                 startActivity(intent);
             }
         });
-
 
         javaCameraView = findViewById(R.id.HelloOpenCvView);
         javaCameraView.setCvCameraViewListener(this);
@@ -114,25 +119,11 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     @Override
     public void onCameraViewStarted(int width, int height)
     {
-        extractor = new DNNExtractor(
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_PROTOTXT),
-                InternalStorageFiles.getFile(InternalStorageFiles.VGG_CAFFE_MODEL)
-        );
-
-        faceDetector = new FaceDetector(
-                InternalStorageFiles.getFile(
-                        InternalStorageFiles.HAARCASCADE_FRONTALFACE)
-                        .getPath());
-
-//        try {
-//            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
-//        } catch(Exception e) {}
     }
 
     @Override
     public void onCameraViewStopped()
     {
-
     }
 
     @Override

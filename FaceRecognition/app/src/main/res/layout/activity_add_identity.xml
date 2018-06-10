@@ -19,6 +19,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <Button
+                android:id="@+id/commitButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ok"

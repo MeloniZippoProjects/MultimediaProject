@@ -68,6 +68,8 @@ public class InternalStorageFiles {
     public static void copyToInternalStorage(int fileId) throws IOException
     {
         File targetFile = InternalStorageFiles.getFile(fileId);
+        if(targetFile.exists())
+            return;
 
         //create the parent directories if they do not exist yet
         File parentDirectory = targetFile.getParentFile();
