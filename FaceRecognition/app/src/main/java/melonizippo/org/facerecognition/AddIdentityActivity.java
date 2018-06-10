@@ -16,6 +16,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
+import melonizippo.org.facerecognition.database.IdentityEntry;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
@@ -78,6 +82,9 @@ public class AddIdentityActivity extends AppCompatActivity
         final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
         labelEditor.setOnClickListener(view -> clearPlaceholderText());
         labelEditor.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
+
+        final Button commitButton = findViewById(R.id.commitButton);
+        commitButton.setOnClickListener(view -> commitAddIdentity());
     }
 
     private void clearPlaceholderText()
@@ -117,10 +124,19 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.show();
     }
 
-    //todo: implement save to database
     private void commitAddIdentity()
     {
-        //should check for duplicate feature first
+        //todo: add checks for duplicate feature, already existing label, enough images...
+
+        IdentityEntry identityEntry = new IdentityEntry();
+        identityEntry.Label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString();
+        identityEntry.Authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
+        identityEntry.IdentityDataset = new ArrayList<>(faceData);
+
+        FaceDatabaseStorage.getFaceDatabase().KnownIdentities.add(identityEntry);
+        FaceDatabaseStorage.store();
+
+        //should clear or exit the activity?
     }
 
     public void choosePhotoFromGallery()
@@ -259,17 +275,5 @@ public class AddIdentityActivity extends AppCompatActivity
 
         faceData.add(fd);
         faceDataAdapter.notifyDataSetChanged();
-    }
-
-    public class FaceDataPreview
-    {
-        public FaceData faceData;
-        public Bitmap preview;
-
-        public FaceDataPreview(FaceData fd)
-        {
-            faceData = fd;
-            preview = fd.toBitmap();
-        }
     }
 }
