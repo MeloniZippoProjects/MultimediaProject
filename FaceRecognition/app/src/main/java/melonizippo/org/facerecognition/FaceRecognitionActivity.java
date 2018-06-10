@@ -14,6 +14,7 @@ import android.view.View;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
 import org.opencv.core.MatOfRect;
@@ -30,11 +31,15 @@ import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 public class FaceRecognitionActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final int PERMISSION_CAMERA = 1;
+    private static final int CAMERA_FRONT = 1;
+    private static final int CAMERA_BACK = 0;
     JavaCameraView javaCameraView;
 
     public FaceDetector faceDetector;
     public DNNExtractor extractor;
     public KNNClassifier knnClassifier;
+
+    private int currentCamera = CAMERA_FRONT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
         javaCameraView = findViewById(R.id.HelloOpenCvView);
         javaCameraView.setCvCameraViewListener(this);
+
+        javaCameraView.setCameraIndex(currentCamera);
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
@@ -109,6 +116,14 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        if(javaCameraView != null)
+            javaCameraView.enableView();
+    }
+
+    @Override
     public void onDestroy()
     {
         super.onDestroy();
@@ -130,10 +145,11 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
     {
         Mat frameMat = adjustMatOrientation(inputFrame.rgba());
+        frameMat = adjustMirroring(frameMat);
         //todo: process with face recognition
         //todo: draw stuff on it
 
-        MatOfRect faces = faceDetector.detect(frameMat, Parameters.FACE_MIN_SIZE, Parameters.FACE_MAX_SIZE);
+        MatOfRect faces = faceDetector.detect(frameMat);
 
         classifyFaces(frameMat, faces);
 
@@ -144,13 +160,20 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         return outputMat;
     }
 
+    private Mat adjustMirroring(Mat frameMat) {
+        Mat mirroredMap = new Mat();
+        if(currentCamera == CAMERA_FRONT)
+            Core.flip(frameMat, mirroredMap, 1);
+        return mirroredMap;
+    }
+
     //todo: define proper return type
     private void classifyFaces(Mat frameMat, MatOfRect faces)
     {
         for(Rect face : faces.toArray())
         {
             Mat faceMat = frameMat.submat(face);
-            float[] faceFeatures = extractor.extract(faceMat, Parameters.DEEP_LAYER);
+            float[] faceFeatures = extractor.extract(faceMat);
 
             //todo: classify with knn
         }
@@ -189,6 +212,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         int rotation = this.getWindowManager().getDefaultDisplay()
                 .getRotation();
         int degrees = 0;
+
         switch (rotation)
         {
             case Surface.ROTATION_0: degrees = 90; break;
@@ -196,6 +220,9 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
             case Surface.ROTATION_180: degrees = 270; break;
             case Surface.ROTATION_270: degrees = 180; break;
         }
+
+        if(currentCamera == CAMERA_FRONT)
+            degrees *= -1;
 
         return degrees;
     }

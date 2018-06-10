@@ -20,8 +20,7 @@
         android:visibility="visible"
         android:id="@+id/HelloOpenCvView"
 
-        opencv:show_fps="true"
-        opencv:camera_id="back"/>
+        opencv:show_fps="true"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/goToIdentitiesEditor"
