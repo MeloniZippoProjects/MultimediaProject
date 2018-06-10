@@ -5,6 +5,7 @@
 
     <ImageView
         android:id="@+id/facePreview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:scaleType="centerInside"/>
 </android.support.constraint.ConstraintLayout>

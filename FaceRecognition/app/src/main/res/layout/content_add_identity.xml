@@ -30,9 +30,9 @@
     <GridView
         android:id="@+id/previewsView"
 
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:numColumns="auto_fit"
+        android:numColumns="3"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
 
