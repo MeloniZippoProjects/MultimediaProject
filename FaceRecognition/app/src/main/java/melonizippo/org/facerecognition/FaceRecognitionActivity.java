@@ -24,7 +24,6 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -33,7 +32,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     private static final int PERMISSION_CAMERA = 1;
     private static final int CAMERA_FRONT = 1;
     private static final int CAMERA_BACK = 0;
-    JavaCameraView javaCameraView;
+    JavaCameraView[] javaCameraViews = new JavaCameraView[2];
 
     public FaceDetector faceDetector;
     public DNNExtractor extractor;
@@ -51,20 +50,27 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         extractor = app.extractor;
         knnClassifier = app.knnClassifier;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.goToIdentitiesEditor);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesEditorActivity.class);
-                startActivity(intent);
-            }
+        FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
+        identitiesEditor.setOnClickListener(view -> {
+            Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesEditorActivity.class);
+            startActivity(intent);
         });
 
-        javaCameraView = findViewById(R.id.HelloOpenCvView);
-        javaCameraView.setCvCameraViewListener(this);
+        FloatingActionButton switchCamera = findViewById(R.id.switchCamera);
+        switchCamera.setOnClickListener(view -> {
+            toggleJavaCameraView();
+        });
 
-        javaCameraView.setCameraIndex(currentCamera);
+        javaCameraViews[CAMERA_BACK] = findViewById(R.id.backCameraView);
+        javaCameraViews[CAMERA_FRONT] = findViewById(R.id.frontCameraView);
+
+        for(JavaCameraView cameraView : javaCameraViews)
+            cameraView.setCvCameraViewListener(this);
+
+        if(savedInstanceState != null)
+        {
+            currentCamera = savedInstanceState.getInt("currentCamera");
+        }
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
@@ -75,8 +81,16 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
                     PERMISSION_CAMERA);
         }
         else {
-            enableJavaCameraView();
+            enableJavaCameraView(javaCameraViews[currentCamera]);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        outState.putInt("currentCamera", currentCamera);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -89,17 +103,29 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
             case PERMISSION_CAMERA: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enableJavaCameraView();
+                    enableJavaCameraView(javaCameraViews[currentCamera]);
                 }
                 return;
             }
         }
     }
 
-    protected void enableJavaCameraView()
+    protected void toggleJavaCameraView()
+    {
+        JavaCameraView currentCameraView = javaCameraViews[currentCamera];
+        disableJavaCameraView(currentCameraView);
+
+        currentCamera = (currentCamera + 1)%2;
+
+        JavaCameraView nextCameraView = javaCameraViews[currentCamera];
+        enableJavaCameraView(nextCameraView);
+    }
+
+    protected void enableJavaCameraView(JavaCameraView javaCameraView)
     {
         try {
             javaCameraView.enableView();
+            javaCameraView.setVisibility(View.VISIBLE);
             Log.d("test", "enable java camera view");
         }
         catch(Exception e) {
@@ -107,28 +133,41 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         }
     }
 
+    protected void disableJavaCameraView(JavaCameraView javaCameraView)
+    {
+        try {
+            javaCameraView.disableView();
+            javaCameraView.setVisibility(View.GONE);
+            Log.d("test", "disabled java camera view");
+        }
+        catch(Exception e) {
+            Log.e("prova", "cannot disable camera");
+        }
+    }
+
     @Override
     public void onPause()
     {
         super.onPause();
-        if (javaCameraView != null)
-            javaCameraView.disableView();
+        if (javaCameraViews != null) {
+            disableJavaCameraView(javaCameraViews[currentCamera]);
+        }
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
-        if(javaCameraView != null)
-            javaCameraView.enableView();
+        if(javaCameraViews != null)
+            enableJavaCameraView(javaCameraViews[currentCamera]);
     }
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
-        if (javaCameraView != null)
-            javaCameraView.disableView();
+        if (javaCameraViews != null)
+            disableJavaCameraView(javaCameraViews[currentCamera]);
     }
 
     @Override
@@ -162,9 +201,12 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
     private Mat adjustMirroring(Mat frameMat) {
         Mat mirroredMap = new Mat();
-        if(currentCamera == CAMERA_FRONT)
+        if(currentCamera == CAMERA_FRONT) {
             Core.flip(frameMat, mirroredMap, 1);
-        return mirroredMap;
+            return mirroredMap;
+        }
+        return frameMat;
+
     }
 
     //todo: define proper return type
