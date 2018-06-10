@@ -19,6 +19,14 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <CheckBox
+        android:id="@+id/sendAlertCheckbox"
+        android:text="Start alarm when detected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/identityLabelField"/>
+
     <ListView
         android:id="@+id/previewsView"
 
@@ -28,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/identityLabelField"
+        app:layout_constraintTop_toBottomOf="@+id/sendAlertCheckbox"
     />
 
 </android.support.constraint.ConstraintLayout>

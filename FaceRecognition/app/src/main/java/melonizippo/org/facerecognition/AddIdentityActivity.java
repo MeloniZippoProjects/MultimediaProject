@@ -117,6 +117,12 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.show();
     }
 
+    //todo: implement save to database
+    private void commitAddIdentity()
+    {
+        //should check for duplicate feature first
+    }
+
     public void choosePhotoFromGallery()
     {
         Intent galleryIntent = new Intent(
