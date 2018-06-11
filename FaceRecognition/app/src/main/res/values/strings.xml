@@ -5,6 +5,9 @@
     <string name="title_activity_add_identity">AddIdentityActivity</string>
 
     <!-- AddIdentity -->
+    <string name="labelPlaceholder">Insert name</string>
+    <string name="alarmCheckBoxText">Start alarm when detected</string>
+
     <string name="info_add_success">Identity added to database</string>
     <string name="error_no_name">Must specify a name</string>
     <string name="error_name_duplicate">This name is already used in the database</string>
