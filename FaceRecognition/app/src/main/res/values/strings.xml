@@ -11,5 +11,6 @@
     <string name="info_add_success">Identity added to database</string>
     <string name="error_no_name">Must specify a name</string>
     <string name="error_name_duplicate">This name is already used in the database</string>
+    <string name="error_not_enough_samples">Not enough samples! Need at least %1$d </string>
 
 </resources>

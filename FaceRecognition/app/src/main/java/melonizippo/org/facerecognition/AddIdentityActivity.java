@@ -3,6 +3,7 @@ package melonizippo.org.facerecognition;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.icu.util.Calendar;
 import android.net.Uri;
@@ -37,6 +38,7 @@ import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.IdentityEntry;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -194,7 +196,20 @@ public class AddIdentityActivity extends AppCompatActivity
             return false;
         }
 
-        //todo: add checks for duplicate feature, not enough images...
+        identityEntry.filterDuplicatesFromDataset();
+
+        int datasetCount = identityEntry.identityDataset.size();
+        if(datasetCount < Parameters.MIN_IDENTITY_SAMPLES)
+        {
+            Resources res = getResources();
+            String errorMessage = getString(R.string.error_not_enough_samples, Parameters.MIN_IDENTITY_SAMPLES);
+            Snackbar errorBar = Snackbar.make(
+                    findViewById(R.id.addIdentityCoordinatorLayout),
+                    errorMessage,
+                    Snackbar.LENGTH_SHORT);
+            errorBar.show();
+            return false;
+        }
 
         return true;
     }

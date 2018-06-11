@@ -8,4 +8,9 @@ public class IdentityEntry implements Serializable
     public String label;
     public boolean authorized;
     public List<FaceData> identityDataset;
+
+    public void filterDuplicatesFromDataset()
+    {
+        //todo: remove duplicates from dataset
+    }
 }
