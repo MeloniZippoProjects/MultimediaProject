@@ -37,6 +37,7 @@ import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.IdentityEntry;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -46,6 +47,9 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final int PICK_IMAGE = 1;
     private static final int SHOOT_IMAGE = 2;
     private static final int PICK_IMAGE_MULTIPLE = 3;
+
+
+    private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
 
     private boolean isDefaultLabel = true;
 
@@ -273,7 +277,7 @@ public class AddIdentityActivity extends AppCompatActivity
         Bitmap imageBitmap;
         try
         {
-             imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }
         catch (Exception ex)
         {
@@ -281,8 +285,16 @@ public class AddIdentityActivity extends AppCompatActivity
             return;
         }
 
+        imageBitmap = scaleBitmap(imageBitmap);
+
         Mat imageMat = new Mat();
         Utils.bitmapToMat(imageBitmap, imageMat);
+
+
+        //Mat resizedMat = imageMat.clone();
+
+        Bitmap testBitmap = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(imageMat, testBitmap);
 
         MatOfRect facesMat = faceDetector.detect(imageMat);
         Rect[] faces = facesMat.toArray();
@@ -316,5 +328,34 @@ public class AddIdentityActivity extends AppCompatActivity
 
         faceData.add(fd);
         faceDataAdapter.notifyDataSetChanged();
+    }
+
+    private static Bitmap scaleBitmap(Bitmap tmpBitmap) {
+        Bitmap imageBitmap;
+        if(tmpBitmap.getWidth() > MAX_DIMENSION || tmpBitmap.getHeight() > MAX_DIMENSION)
+        {
+            double factor;
+            int dstWidth;
+            int dstHeight;
+            if(tmpBitmap.getWidth() >= tmpBitmap.getHeight())
+            {
+                factor = MAX_DIMENSION / (double) tmpBitmap.getWidth();
+                dstWidth = MAX_DIMENSION;
+                dstHeight = (int)(tmpBitmap.getHeight() * factor);
+            }
+            else
+            {
+                factor = MAX_DIMENSION / (double) tmpBitmap.getHeight();
+                dstHeight = MAX_DIMENSION;
+                dstWidth = (int)(tmpBitmap.getWidth() * factor);
+            }
+
+            imageBitmap = Bitmap.createScaledBitmap(tmpBitmap, dstWidth, dstHeight, false);
+        }
+        else
+        {
+            imageBitmap = tmpBitmap;
+        }
+        return imageBitmap;
     }
 }
