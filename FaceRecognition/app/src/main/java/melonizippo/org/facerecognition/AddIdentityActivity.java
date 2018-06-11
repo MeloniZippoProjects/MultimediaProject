@@ -275,8 +275,8 @@ public class AddIdentityActivity extends AppCompatActivity
         Rect faceRect = faces[0];
 
         FaceData fd = new FaceData();
-        fd.faceMat = imageMat.submat(faceRect);
-        fd.features = extractor.extract(fd.faceMat);
+        fd.setFaceMat(imageMat.submat(faceRect));
+        fd.setFeatures(extractor.extract(fd.getFaceMat()));
 
         faceData.add(fd);
         faceDataAdapter.notifyDataSetChanged();

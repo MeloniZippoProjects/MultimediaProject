@@ -12,8 +12,8 @@ import org.opencv.core.Mat;
 
 public class FaceData implements Serializable
 {
-    public Mat faceMat;
-    public float[] features;
+    protected Mat faceMat;
+    protected float[] features;
 
     //Bitmap conversion
     public Bitmap toBitmap()
@@ -31,6 +31,22 @@ public class FaceData implements Serializable
         fds.serializeMat(faceMat);
 
         oos.writeObject(fds);
+    }
+
+    public Mat getFaceMat() {
+        return faceMat;
+    }
+
+    public void setFaceMat(Mat faceMat) {
+        this.faceMat = faceMat;
+    }
+
+    public float[] getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(float[] features) {
+        this.features = features;
     }
 
     private void readObject(ObjectInputStream ois)
