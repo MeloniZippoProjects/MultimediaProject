@@ -10,9 +10,13 @@ import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -49,8 +53,18 @@ public class FaceRecognitionApp extends Application {
 
         copyFiles();
 
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            System.gc();
+            System.runFinalization();
+        },
+                Parameters.GC_INTERVAL,
+                Parameters.GC_INTERVAL,
+                TimeUnit.SECONDS);
+
         initFaceRecognition();
     }
+
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private void copyFiles()
     {
