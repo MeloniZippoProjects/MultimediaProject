@@ -56,12 +56,18 @@ public class AddIdentityActivity extends AppCompatActivity
     private File cameraPictureFile;
     private Uri cameraPictureUri;
 
-    private List<FaceData> faceData = new ArrayList<>();
+    private List<FaceData> faceDataset = new ArrayList<>();
     private static FaceDataAdapter faceDataAdapter;
 
     private FaceDetector faceDetector;
     private DNNExtractor extractor;
     private KNNClassifier knnClassifier;
+
+    private TextInputEditText labelField;
+
+    private static final String LABEL_TEXT_KEY = "identity_label_text";
+    private static final String DATASET_KEY = "face_dataset";
+    private static final String IS_DEFAULT_LABEL_KEY = "is_default_label";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,33 +77,59 @@ public class AddIdentityActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        labelField = findViewById(R.id.identityLabelField);
+
+        //Load saved state
+        if(savedInstanceState != null)
+        {
+            labelField.setText(savedInstanceState.getString(LABEL_TEXT_KEY));
+            isDefaultLabel = savedInstanceState.getBoolean(IS_DEFAULT_LABEL_KEY);
+            for(Object faceDataObject : (Object[]) savedInstanceState.getSerializable(DATASET_KEY))
+            {
+                FaceData faceData = (FaceData) faceDataObject;
+                faceDataset.add(faceData);
+            }
+        }
+
+        //Load face recognition references
         FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
         faceDetector = app.faceDetector;
         extractor = app.extractor;
         knnClassifier = app.knnClassifier;
 
-        faceDataAdapter = new FaceDataAdapter(faceData, getApplicationContext());
-
+        //Setup grid view
+        faceDataAdapter = new FaceDataAdapter(faceDataset, getApplicationContext());
         GridView previewsView = findViewById(R.id.previewsView);
         previewsView.setAdapter(faceDataAdapter);
 
-        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotos);
+        //Setup listeners
+        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotosButton);
         addPhotosButton.setOnClickListener((view) -> showPictureDialog());
 
-        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
-        labelEditor.setOnClickListener(view -> clearPlaceholderText());
-        labelEditor.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
+        FloatingActionButton clearFormButton = findViewById(R.id.clearFormButton);
+        clearFormButton.setOnClickListener((view) -> clearForm());
+
+        labelField.setOnClickListener(view -> clearPlaceholderText());
+        labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
 
         final Button commitButton = findViewById(R.id.commitButton);
         commitButton.setOnClickListener(view -> commitAddIdentity());
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString(LABEL_TEXT_KEY, labelField.getText().toString());
+        outState.putBoolean(IS_DEFAULT_LABEL_KEY, isDefaultLabel);
+        outState.putSerializable(DATASET_KEY, faceDataset.toArray());
+    }
+
     private void clearPlaceholderText()
     {
-        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
         if(isDefaultLabel)
         {
-            labelEditor.setText("");
+            labelField.getText().clear();
             isDefaultLabel = false;
         }
     }
@@ -134,7 +166,7 @@ public class AddIdentityActivity extends AppCompatActivity
         IdentityEntry identityEntry = new IdentityEntry();
         identityEntry.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
         identityEntry.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
-        identityEntry.identityDataset = new ArrayList<>(faceData);
+        identityEntry.identityDataset = new ArrayList<>(faceDataset);
 
         if(!validateIdentity(identityEntry))
             return;
@@ -144,7 +176,7 @@ public class AddIdentityActivity extends AppCompatActivity
             FaceDatabaseStorage.store();
 
             showSnackBar(R.string.info_add_success);
-            //should clear or exit the activity?
+            clearForm();
         }
     }
 
@@ -169,6 +201,15 @@ public class AddIdentityActivity extends AppCompatActivity
         //todo: add checks for duplicate feature, not enough images...
 
         return true;
+    }
+
+    private void clearForm()
+    {
+        labelField.getText().clear();
+        faceDataset.clear();
+        faceDataAdapter.notifyDataSetChanged();
+
+        Log.i(TAG, "Form cleared");
     }
 
     private void showSnackBar(int stringId)
@@ -326,7 +367,7 @@ public class AddIdentityActivity extends AppCompatActivity
         fd.setFaceMat(imageMat.submat(faceRect));
         fd.setFeatures(extractor.extract(fd.getFaceMat()));
 
-        faceData.add(fd);
+        faceDataset.add(fd);
         faceDataAdapter.notifyDataSetChanged();
     }
 
