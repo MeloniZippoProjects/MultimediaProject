@@ -1,5 +1,7 @@
 package melonizippo.org.facerecognition.deep;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
@@ -43,31 +45,22 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 		this.label = label;
 	}
 
-	public double getDist() {
-		return dist;
-	}
-
-	public void setDist(double dist) {
-		this.dist = dist;
-	}
-
 	// compare with other friends using distances
 	@Override
-	public int compareTo(ImgDescriptor arg0) {
-		return new Double(dist).compareTo(arg0.dist);
+	public int compareTo(@NonNull ImgDescriptor arg0) {
+
+		return Double.compare(dist, arg0.dist);
 	}
-	
-	//evaluate Euclidian distance
-	public double distance(ImgDescriptor desc) {
-		float[] queryVector = desc.getFeatures();
-		
-		dist = 0;
-		for (int i = 0; i < queryVector.length; i++) {
-			dist += (normalizedVector[i] - queryVector[i]) * (normalizedVector[i] - queryVector[i]);
-		}
-		dist = Math.sqrt(dist);
-		
-		return dist;
+
+	public double getSimilarity(@NonNull ImgDescriptor queryDescriptor)
+	{
+		float[] queryVector = queryDescriptor.getFeatures();
+		double scalarProduct = 0;
+
+		for(int i = 0; i < queryVector.length; ++i)
+			scalarProduct += getFeatures()[i] * queryVector[i];
+
+		return scalarProduct;
 	}
 	
 	//Normalize the vector values 
@@ -83,8 +76,8 @@ public class ImgDescriptor implements Serializable, Comparable<ImgDescriptor> {
 	//Norm 2
 	private float evaluateNorm2(float[] vector) {
 		float norm2 = 0;
-		for (int i = 0; i < vector.length; i++) {
-			norm2 += (vector[i]) * (vector[i]);
+		for (float elem : vector) {
+			norm2 += (elem) * (elem);
 		}
 		norm2 = (float) Math.sqrt(norm2);
 		
