@@ -190,7 +190,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
         MatOfRect faces = faceDetector.detect(frameMat);
 
-        classifyFaces(frameMat, faces);
+        if(faces.toArray().length != 0)
+            classifyFaces(frameMat, faces);
 
         //todo: if intruder, send alarm and store it
 
