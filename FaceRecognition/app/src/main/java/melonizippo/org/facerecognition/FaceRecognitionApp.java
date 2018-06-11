@@ -34,12 +34,19 @@ public class FaceRecognitionApp extends Application {
             InternalStorageFiles.VGG_CAFFE_MODEL
     };
 
-    private static Context context;
+    private static FaceRecognitionApp appInstance = null;
+    private static FaceRecognitionApp getAppInstance()
+    {
+        return appInstance;
+    }
+
+    private Context context;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+        FaceRecognitionApp.appInstance = this;
         context = getApplicationContext();
 
         /* even if it is called initDebug it is not actually for debug
@@ -106,6 +113,6 @@ public class FaceRecognitionApp extends Application {
 
     public static Context getAppContext()
     {
-        return context;
+        return appInstance.context;
     }
 }
