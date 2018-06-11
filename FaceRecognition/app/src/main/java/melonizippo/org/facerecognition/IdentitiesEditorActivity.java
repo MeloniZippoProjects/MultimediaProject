@@ -21,19 +21,24 @@ public class IdentitiesEditorActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_identities_editor);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.addIdentity);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view) {
+        FloatingActionButton fab = findViewById(R.id.addIdentity);
+        fab.setOnClickListener((view) -> {
                 Intent intent = new Intent(IdentitiesEditorActivity.this, AddIdentityActivity.class);
                 startActivity(intent);
-            }
         });
 
+        TextView textView = findViewById(R.id.TextView);
+
+        updateText();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
         updateText();
     }
 
@@ -41,7 +46,7 @@ public class IdentitiesEditorActivity extends AppCompatActivity
     {
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         TextView textView = findViewById(R.id.TextView);
-        String text = db.knownIdentities.size() + "known identities:\n";
+        String text = db.knownIdentities.size() + " known identities:\n";
         for(IdentityEntry ie : db.knownIdentities)
         {
             text += "Label: " + ie.label +
