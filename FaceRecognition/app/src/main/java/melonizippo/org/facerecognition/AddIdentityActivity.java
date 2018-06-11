@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -19,7 +20,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -33,10 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.IdentityEntry;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -127,17 +127,53 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void commitAddIdentity()
     {
-        //todo: add checks for duplicate feature, already existing label, enough images...
-
         IdentityEntry identityEntry = new IdentityEntry();
-        identityEntry.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString();
+        identityEntry.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
         identityEntry.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
         identityEntry.identityDataset = new ArrayList<>(faceData);
 
-        FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identityEntry);
-        FaceDatabaseStorage.store();
+        if(!validateIdentity(identityEntry))
+            return;
+        else
+        {
+            FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identityEntry);
+            FaceDatabaseStorage.store();
 
-        //should clear or exit the activity?
+            showSnackBar(R.string.info_add_success);
+            //should clear or exit the activity?
+        }
+    }
+
+    private boolean validateIdentity(IdentityEntry identityEntry)
+    {
+        if(identityEntry.label.matches(""))
+        {
+            showSnackBar(R.string.error_no_name);
+            return false;
+        }
+
+        FaceDatabase fd = FaceDatabaseStorage.getFaceDatabase();
+        if(
+                fd.knownIdentities.stream().anyMatch(
+                        (dbIdentity) -> dbIdentity.label.matches(identityEntry.label))
+        )
+        {
+            showSnackBar(R.string.error_name_duplicate);
+            return false;
+        }
+
+        //todo: add checks for duplicate feature, not enough images...
+
+        return true;
+    }
+
+    private void showSnackBar(int stringId)
+    {
+        Snackbar errorBar = Snackbar.make(
+                findViewById(R.id.addIdentityCoordinatorLayout),
+                stringId,
+                Snackbar.LENGTH_SHORT);
+        errorBar.show();
     }
 
     public void choosePhotoFromGallery()

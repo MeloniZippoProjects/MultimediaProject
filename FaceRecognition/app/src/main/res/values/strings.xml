@@ -3,4 +3,10 @@
     <string name="title_activity_prova">ProvaActivity</string>
     <string name="title_activity_identities_editor">IdentitiesEditorActivity</string>
     <string name="title_activity_add_identity">AddIdentityActivity</string>
+
+    <!-- AddIdentity -->
+    <string name="info_add_success">Identity added to database</string>
+    <string name="error_no_name">Must specify a name</string>
+    <string name="error_name_duplicate">This name is already used in the database</string>
+
 </resources>
