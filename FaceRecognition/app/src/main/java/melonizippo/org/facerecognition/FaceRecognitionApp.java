@@ -2,6 +2,7 @@ package melonizippo.org.facerecognition;
 
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
@@ -29,9 +30,14 @@ public class FaceRecognitionApp extends Application {
             InternalStorageFiles.VGG_CAFFE_MODEL
     };
 
+    private static Context context;
+
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
+        context = getApplicationContext();
+
         /* even if it is called initDebug it is not actually for debug
          * It just calls loadLibrary("opencv_java3") and some other needed stuff
          */
@@ -39,7 +45,7 @@ public class FaceRecognitionApp extends Application {
 
         //initialize internal storage with assets and internal storage dir
         initInternalStorage(getAssets(), getCacheDir());
-        FaceDatabaseStorage.setFileStorage(getFilesDir());
+        FaceDatabaseStorage.setFileStorage(getDataDir());
 
         copyFiles();
 
@@ -82,5 +88,10 @@ public class FaceRecognitionApp extends Application {
     {
         InternalStorageFiles.setAssetManager(assetManager);
         InternalStorageFiles.setInternalStorage(internalStorage);
+    }
+
+    public static Context getAppContext()
+    {
+        return context;
     }
 }

@@ -33,9 +33,10 @@ public class FaceDataAdapter extends ArrayAdapter<FaceData>
         {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.face_preview, parent, false);
-            ImageView imageView = (ImageView) convertView.findViewById(R.id.facePreview);
-            imageView.setImageBitmap(fd.toBitmap());
         }
+
+        ImageView imageView = convertView.findViewById(R.id.facePreview);
+        imageView.setImageBitmap(fd.toBitmap());
 
         return convertView;
     }

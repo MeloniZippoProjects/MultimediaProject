@@ -29,9 +29,9 @@ public class Parameters {
 
 	//Parameters for face detector
 
-	public static final double SCALE_FACTOR = 1.05;
+	public static final double SCALE_FACTOR = 1.2;
 	public static final int CANNY_PRUNING = 1;
-	public static final int MIN_NEIGHBORS = 2;
+	public static final int MIN_NEIGHBORS = 3;
 	public static final Size FACE_MIN_SIZE = new Size(120, 120);
 	public static final Size FACE_MAX_SIZE = new Size(500, 500);
 
