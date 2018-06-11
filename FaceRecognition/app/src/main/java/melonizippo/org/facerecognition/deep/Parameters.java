@@ -45,4 +45,5 @@ public class Parameters {
 
 	public static final int MAX_DIMENSION = 1349;
 	public static final long GC_INTERVAL = 60;
+	public static final int MIN_IDENTITY_SAMPLES = 10;
 }
