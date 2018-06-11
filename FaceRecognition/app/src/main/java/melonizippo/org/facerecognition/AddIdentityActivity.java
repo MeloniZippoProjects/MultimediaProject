@@ -99,8 +99,11 @@ public class AddIdentityActivity extends AppCompatActivity
         previewsView.setAdapter(faceDataAdapter);
 
         //Setup listeners
-        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotos);
+        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotosButton);
         addPhotosButton.setOnClickListener((view) -> showPictureDialog());
+
+        FloatingActionButton clearFormButton = findViewById(R.id.clearFormButton);
+        clearFormButton.setOnClickListener((view) -> clearForm());
 
         labelField.setOnClickListener(view -> clearPlaceholderText());
         labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
@@ -120,10 +123,9 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void clearPlaceholderText()
     {
-        final TextInputEditText labelEditor = findViewById(R.id.identityLabelField);
         if(isDefaultLabel)
         {
-            labelEditor.setText("");
+            labelField.getText().clear();
             isDefaultLabel = false;
         }
     }
@@ -170,7 +172,7 @@ public class AddIdentityActivity extends AppCompatActivity
             FaceDatabaseStorage.store();
 
             showSnackBar(R.string.info_add_success);
-            //should clear or exit the activity?
+            clearForm();
         }
     }
 
@@ -195,6 +197,15 @@ public class AddIdentityActivity extends AppCompatActivity
         //todo: add checks for duplicate feature, not enough images...
 
         return true;
+    }
+
+    private void clearForm()
+    {
+        labelField.getText().clear();
+        faceDataset.clear();
+        faceDataAdapter.notifyDataSetChanged();
+
+        Log.i(TAG, "Form cleared");
     }
 
     private void showSnackBar(int stringId)
