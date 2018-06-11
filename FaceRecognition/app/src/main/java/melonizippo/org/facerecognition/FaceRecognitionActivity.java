@@ -180,6 +180,8 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     {
     }
 
+
+
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame)
     {
@@ -198,10 +200,12 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
         Mat outputMat = printFaceBoxesOnMat(frameMat, faces);
 
         return outputMat;
+        //return inputFrame.rgba();
     }
 
+    private static Mat mirroredMap = new Mat();
     private Mat adjustMirroring(Mat frameMat) {
-        Mat mirroredMap = new Mat();
+
         if(currentCamera == CAMERA_FRONT) {
             Core.flip(frameMat, mirroredMap, 1);
             return mirroredMap;
@@ -211,38 +215,39 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
     }
 
     //todo: define proper return type
+    private static Mat faceMat = new Mat();
     private void classifyFaces(Mat frameMat, MatOfRect faces)
     {
         for(Rect face : faces.toArray())
         {
-            Mat faceMat = frameMat.submat(face);
+            faceMat = frameMat.submat(face);
             float[] faceFeatures = extractor.extract(faceMat);
 
             //todo: classify with knn
         }
     }
 
+    private static Mat outputMat = new Mat();
+    private static Scalar rectColor = new Scalar(0, 0, 255);
     private Mat printFaceBoxesOnMat(Mat frameMat, MatOfRect faces)
     {
-        Mat outputMat = frameMat.clone();
+        frameMat.copyTo(outputMat);
         for(Rect rect : faces.toArray())
         {
             Point p1 = rect.tl();
             Point p2 = rect.br();
-            Imgproc.rectangle(outputMat, p1, p2, new Scalar(0, 0, 255), 5);
+            Imgproc.rectangle(outputMat, p1, p2, rectColor, 5);
         }
-
         return outputMat;
     }
 
+    static Mat rotatedMat = new Mat();
     private Mat adjustMatOrientation(Mat frameMat)
     {
         int degrees = getOrientationDegrees();
         if(degrees != 0) //check for potrait mode
         {
             Mat rotationMat = Imgproc.getRotationMatrix2D(new Point(frameMat.width() / 2, frameMat.height() / 2), degrees, 1);
-            //Mat rotatedMat = new Mat(new Size(frameMat.height(), frameMat.width()), CvType.CV_8UC4);
-            Mat rotatedMat = new Mat();
             Imgproc.warpAffine(frameMat, rotatedMat, rotationMat, frameMat.size());
             return rotatedMat;
         }

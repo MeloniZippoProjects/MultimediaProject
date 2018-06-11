@@ -26,9 +26,10 @@ public class FaceDetector {
 	}
 
 	//TODO
+	private MatOfRect rectVector = new MatOfRect();
 	public MatOfRect detect(Mat img) {
 		//detect faces
-		MatOfRect rectVector = new MatOfRect();
-		face_cascade.detectMultiScale(img, rectVector, scaleFactor, minNeighbors, cannyPruning, minSize, maxSize);		return rectVector;
+		face_cascade.detectMultiScale(img, rectVector, scaleFactor, minNeighbors, cannyPruning, minSize, maxSize);
+		return rectVector;
 	}
 }
