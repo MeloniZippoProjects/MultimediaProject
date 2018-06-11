@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.TextView;
 
 import melonizippo.org.facerecognition.database.FaceDatabase;
@@ -24,13 +23,16 @@ public class IdentitiesEditorActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.addIdentity);
-        fab.setOnClickListener((view) -> {
+        FloatingActionButton addIdentityButton = findViewById(R.id.addIdentity);
+        addIdentityButton.setOnClickListener((view) -> {
                 Intent intent = new Intent(IdentitiesEditorActivity.this, AddIdentityActivity.class);
                 startActivity(intent);
         });
 
-        TextView textView = findViewById(R.id.TextView);
+        FloatingActionButton clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
+        clearDatabaseButton.setOnClickListener((view) -> {
+            FaceDatabaseStorage.clear();
+        });
 
         updateText();
     }

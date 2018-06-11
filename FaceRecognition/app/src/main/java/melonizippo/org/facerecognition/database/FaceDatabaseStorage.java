@@ -63,4 +63,10 @@ public class FaceDatabaseStorage
             Log.d(TAG, "Database store failed");
         }
     }
+
+    public static void clear()
+    {
+        faceDatabase = new FaceDatabase();
+        store();
+    }
 }
