@@ -43,5 +43,6 @@ public class Parameters {
 
 	public static final float KNN_CONF_THRESHOLD = 0.6f;
 
+	public static final int MAX_DIMENSION = 1349;
 	public static final int MIN_IDENTITY_SAMPLES = 10;
 }
