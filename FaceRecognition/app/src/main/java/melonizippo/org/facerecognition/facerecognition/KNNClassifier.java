@@ -1,51 +1,91 @@
 package melonizippo.org.facerecognition.facerecognition;
 
-import melonizippo.org.facerecognition.deep.ImgDescriptor;
+import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabase;
+import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
+import melonizippo.org.facerecognition.database.IdentityEntry;
+import melonizippo.org.facerecognition.database.LabeledFaceData;
 import melonizippo.org.facerecognition.deep.Parameters;
-import melonizippo.org.facerecognition.deep.seq.SeqImageSearch;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class KNNClassifier {
 
-	private SeqImageSearch sequentialScan;
+	private FaceDatabase faceDatabase;
 
-	public KNNClassifier(File storageFile) throws IOException, ClassNotFoundException {
-		sequentialScan = new SeqImageSearch();
-		sequentialScan.open(storageFile);
+	public KNNClassifier()
+	{
+		faceDatabase = FaceDatabaseStorage.getFaceDatabase();
 	}
 
 	//TODO
-	public PredictedClass predict(ImgDescriptor query) {
+	public PredictedClass predict(FaceData query) {
 		//perform a kNN similarity search and call getBestLabel to retrieve the best label
-		return getBestLabel(sequentialScan.search(query, Parameters.K));
 
+		TreeMap<Double, LabeledFaceData> sortedFaceData = new TreeMap<>();
+
+		//check on known identities
+		for(IdentityEntry identityEntry : faceDatabase.knownIdentities)
+		{
+			for(FaceData faceData : identityEntry.identityDataset)
+			{
+				LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, identityEntry.label);
+				double similarity = labeledFaceData.getSimilarity(query);
+				sortedFaceData.put(similarity, labeledFaceData);
+			}
+		}
+
+		//check in uncategorized data
+		for(FaceData faceData : faceDatabase.uncategorizedData)
+		{
+			LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, "unknown");
+			double similarity = labeledFaceData.getSimilarity(query);
+			sortedFaceData.put(similarity, labeledFaceData);
+		}
+
+		//take first K
+		List<Map.Entry<Double,LabeledFaceData>> nearestNeighbours = new LinkedList<>();
+
+		for(Map.Entry<Double,LabeledFaceData> faceData : sortedFaceData.descendingMap().entrySet())
+		{
+			int k = Parameters.K;
+			if(nearestNeighbours.size() < k)
+				nearestNeighbours.add(faceData);
+			else
+				break;
+		}
+
+		return getBestLabel(nearestNeighbours);
 	}
 
+
 	//TODO
-	private PredictedClass getBestLabel(List<ImgDescriptor> results) {
+	private PredictedClass getBestLabel(List<Map.Entry<Double,LabeledFaceData>> results) {
 		//Loop in the results list and retrieve the best label
 
-		HashMap<String, Integer> labelScores = new HashMap<>();
+		HashMap<String, Integer> labelCounts = new HashMap<>();
+		HashMap<String, Double> bestLabelsScore = new HashMap<>();
 
-		for(ImgDescriptor descriptor : results)
+		for(Map.Entry<Double,LabeledFaceData> descriptor : results)
 		{
-			String label = descriptor.getLabel();
+			String label = descriptor.getValue().getLabel();
+			Integer labelCount = labelCounts.getOrDefault(label, 0);
+			labelCounts.put(label, labelCount + 1);
 
-			Integer score = labelScores.getOrDefault(label, 0);
-
-			labelScores.put(label, score + 1);
+			Double currentLabelScore = bestLabelsScore.getOrDefault(label, 0d);
+			if(descriptor.getKey() > currentLabelScore)
+				bestLabelsScore.put(label, descriptor.getKey());
 		}
-		Optional<Map.Entry<String,Integer>> bestLabel = labelScores.entrySet().stream().
+
+		Optional<Map.Entry<String,Integer>> bestLabelOptional = labelCounts.entrySet().stream().
 				max(Comparator.comparing(Map.Entry::getValue));
 
-		if(bestLabel.isPresent())
+		if(bestLabelOptional.isPresent())
 		{
-			String label = bestLabel.get().getKey();
-			Float confidence = bestLabel.get().getValue().floatValue()/Parameters.K;
-			return new PredictedClass(label, confidence);
+			String bestLabel = bestLabelOptional.get().getKey();
+			Double confidence = bestLabelsScore.get(bestLabel);
+
+			return new PredictedClass(bestLabel, confidence);
 		}
 
 		return null;

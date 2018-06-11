@@ -1,11 +1,13 @@
 package melonizippo.org.facerecognition.facerecognition;
 
+import android.support.annotation.NonNull;
+
 public class PredictedClass implements Comparable<PredictedClass> {
 	
 	private String label;
-	private float conf;
+	private double conf;
 	
-	public PredictedClass(String label, float conf) {
+	public PredictedClass(String label, double conf) {
 		this.label = label;
 		this.conf = conf;
 	}
@@ -13,13 +15,13 @@ public class PredictedClass implements Comparable<PredictedClass> {
 	public String getLabel() {
 		return label;
 	}
-	public float getConfidence() {
+	public double getConfidence() {
 		return conf;
 	}
 
 	@Override
-	public int compareTo(PredictedClass o) {
-		return - new Float(conf).compareTo(o.conf);
+	public int compareTo(@NonNull PredictedClass o) {
+		return -Double.compare(conf, o.conf);
 	}
 	
 	@Override

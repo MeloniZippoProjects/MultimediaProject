@@ -1,6 +1,7 @@
 package melonizippo.org.facerecognition.database;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -55,5 +56,16 @@ public class FaceData implements Serializable
         FaceDataSerialization fds = (FaceDataSerialization) ois.readObject();
         features = fds.features;
         faceMat = fds.deserializeMat();
+    }
+
+    public double getSimilarity(@NonNull FaceData queryData)
+    {
+        float[] queryVector = queryData.getFeatures();
+        double scalarProduct = 0;
+
+        for(int i = 0; i < queryVector.length; ++i)
+            scalarProduct += getFeatures()[i] * queryVector[i];
+
+        return scalarProduct;
     }
 }
