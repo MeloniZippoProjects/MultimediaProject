@@ -313,6 +313,7 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
+    private Mat imageMat = new Mat();
     private void addImage(Uri imageUri)
     {
         Bitmap imageBitmap;
@@ -328,14 +329,8 @@ public class AddIdentityActivity extends AppCompatActivity
 
         imageBitmap = scaleBitmap(imageBitmap);
 
-        Mat imageMat = new Mat();
         Utils.bitmapToMat(imageBitmap, imageMat);
 
-
-        //Mat resizedMat = imageMat.clone();
-
-        Bitmap testBitmap = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(imageMat, testBitmap);
 
         MatOfRect facesMat = faceDetector.detect(imageMat);
         Rect[] faces = facesMat.toArray();

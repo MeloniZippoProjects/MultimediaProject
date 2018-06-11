@@ -36,25 +36,20 @@ public class DNNExtractor {
 		layer = Parameters.DEEP_LAYER;
 	}
 
-	public float[] extract(File image) {
-		Mat img = imread(image.getPath());
-		return extract(img);
-	}
-
     //todo: verify correctness of this implementation porting
+
+
+	private Mat converted = new Mat();
     public float[] extract(Mat img)
 	{
 		//temp workaround to avoid runtime crashes
 		//return new float[]{0.0f, 1.1f, 3.5f};
 
-		//test
-		Mat converted = new Mat();
-
 		//when using resnet the mat must be bgr
 		//Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2BGR);
 
 		//when using lightened the mat can be rgba (or bgra?)
-		converted = img.clone();
+		img.copyTo(converted);
 
 		Mat inputBlob = blobFromImage(converted, 1.0, imgSize, mean, false, false); // Convert Mat to dnn::Blob image batch
 
