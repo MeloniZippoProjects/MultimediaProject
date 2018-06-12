@@ -228,7 +228,7 @@ public class AddIdentityActivity extends AppCompatActivity
         else
         {
             FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identityEntry);
-            FaceDatabaseStorage.store();
+            FaceDatabaseStorage.storeToInternalStorage();
 
             showSnackBar(R.string.info_add_success);
             clearForm();
@@ -366,7 +366,8 @@ public class AddIdentityActivity extends AppCompatActivity
                 }
                 else
                 {
-                    if (data.getClipData() != null) {
+                    if (data.getClipData() != null)
+                    {
                         ClipData clipData = data.getClipData();
                         int itemCount = clipData.getItemCount();
                         for (int i = 0; i < itemCount; i++)

@@ -27,11 +27,16 @@ public class FaceDatabaseStorage
     public static FaceDatabase getFaceDatabase()
     {
         if(faceDatabase == null)
-            load();
+            loadFromInternalStorage();
         return faceDatabase;
     }
 
-    public static void load()
+    public static void setFaceDatabase(FaceDatabase newFaceDatabase)
+    {
+        faceDatabase = newFaceDatabase;
+    }
+
+    public static void loadFromInternalStorage()
     {
         try(
                 FileInputStream fis = FaceRecognitionApp.getAppContext().openFileInput(IMAGE_DATABASE_NAME);
@@ -48,7 +53,7 @@ public class FaceDatabaseStorage
         }
     }
 
-    public static void store()
+    public static void storeToInternalStorage()
     {
         try(
                 FileOutputStream fos = FaceRecognitionApp.getAppContext().openFileOutput(IMAGE_DATABASE_NAME, Context.MODE_PRIVATE);
@@ -67,6 +72,7 @@ public class FaceDatabaseStorage
     public static void clear()
     {
         faceDatabase = new FaceDatabase();
-        store();
+        Log.i(TAG, "Database reset");
+        storeToInternalStorage();
     }
 }
