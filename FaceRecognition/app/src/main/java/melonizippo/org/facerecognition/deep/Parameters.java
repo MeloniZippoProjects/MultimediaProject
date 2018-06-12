@@ -9,23 +9,25 @@ public class Parameters {
 	
 	//DEEP parameters for lightened
 
+	/*
 	public static final String DEEP_LAYER = "fc1";
 
 	public static final int IMG_WIDTH = 128;
 	public static final int IMG_HEIGHT = 128;
 
 	public static final Scalar MEAN = new Scalar(0);
+	*/
 
 
 	//DEEP parameters for resnet50
-	/*
+
 	public static final String DEEP_LAYER = "pool5/7x7_s1";
 
 	public static final Scalar MEAN = new Scalar(91.4953, 103.8827, 131.0912);
 
 	public static final int IMG_WIDTH = 224;
 	public static final int IMG_HEIGHT = 224;
-	*/
+
 
 	//Parameters for face detector
 

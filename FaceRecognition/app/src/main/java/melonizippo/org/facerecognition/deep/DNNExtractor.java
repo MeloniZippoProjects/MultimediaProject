@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.dnn.Net;
@@ -46,22 +47,27 @@ public class DNNExtractor {
 		//return new float[]{0.0f, 1.1f, 3.5f};
 
 		//when using resnet the mat must be bgr
-		//Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2BGR);
+		Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2RGB);
+		converted.copyTo(img);
 
 		//when using lightened the mat can be rgba (or bgra?)
-		img.copyTo(converted);
+		//img.copyTo(converted);
 
 		Mat inputBlob = blobFromImage(converted, 1.0, imgSize, mean, false, false); // Convert Mat to dnn::Blob image batch
 
-		net.setInput(inputBlob, "data"); // set the network input
+		net.setInput(inputBlob); // set the network input
 
 		List<Mat> outputBlobs = new ArrayList<>();
 		net.forward(outputBlobs, layer); // compute output
 
 		Mat prob = outputBlobs.get(0);
 
-		float[] features = new float[(int) prob.total()];
-		prob.get(0, 0, features);
+		//this way we force rows and cols to 1x2048
+		//also official tutorials do this (???)
+		Mat featuresMat = prob.reshape(0, 1);
+		float[] features = new float[(int) featuresMat.total()];
+
+		featuresMat.get(0, 0, features);
 
 		return normalizeVector(features);
 	}
