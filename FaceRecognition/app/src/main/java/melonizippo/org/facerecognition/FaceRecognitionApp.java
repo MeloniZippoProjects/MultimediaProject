@@ -100,9 +100,9 @@ public class FaceRecognitionApp extends Application {
                         InternalStorageFiles.HAARCASCADE_FRONTALFACE)
                         .getPath());
 
-//        try {
-//            knnClassifier = new KNNClassifier(File.createTempFile("place", "holder")); //todo: implement internal storage
-//        } catch(Exception e) {}
+
+        knnClassifier = new KNNClassifier();
+
     }
 
     private static void initInternalStorage(AssetManager assetManager, File internalStorage)

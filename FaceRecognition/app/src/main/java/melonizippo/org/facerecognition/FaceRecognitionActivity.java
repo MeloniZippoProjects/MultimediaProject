@@ -23,9 +23,16 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
+import melonizippo.org.facerecognition.facerecognition.LabeledRect;
+import melonizippo.org.facerecognition.facerecognition.PredictedClass;
 
 public class FaceRecognitionActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
@@ -192,14 +199,15 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
         MatOfRect faces = faceDetector.detect(frameMat);
 
-        if(faces.toArray().length != 0)
-            classifyFaces(frameMat, faces);
+        if(faces.toArray().length != 0) {
+            List<LabeledRect> labeledRects = classifyFaces(frameMat, faces);
 
-        //todo: if intruder, send alarm and store it
+            //todo: if intruder, send alarm and store it
 
-        Mat outputMat = printFaceBoxesOnMat(frameMat, faces);
+            frameMat = printFaceBoxesOnMat(frameMat, labeledRects);
+        }
 
-        return outputMat;
+        return frameMat;
         //return inputFrame.rgba();
     }
 
@@ -216,27 +224,38 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
     //todo: define proper return type
     private static Mat faceMat = new Mat();
-    private void classifyFaces(Mat frameMat, MatOfRect faces)
+    private List<LabeledRect> classifyFaces(Mat frameMat, MatOfRect faces)
     {
+        List<LabeledRect> labeledRects = new LinkedList<>();
+
         for(Rect face : faces.toArray())
         {
             faceMat = frameMat.submat(face);
             float[] faceFeatures = extractor.extract(faceMat);
+            FaceData query = new FaceData(faceMat, faceFeatures);
+            PredictedClass predict = knnClassifier.predict(query);
 
-            //todo: classify with knn
+            LabeledRect labeledRect = new LabeledRect(face, predict.getLabel() + "(" + predict.getConfidence() + ")", predict.getConfidence());
+            labeledRects.add(labeledRect);
         }
+
+        return labeledRects;
     }
 
     private static Mat outputMat = new Mat();
     private static Scalar rectColor = new Scalar(0, 0, 255);
-    private Mat printFaceBoxesOnMat(Mat frameMat, MatOfRect faces)
+    private Mat printFaceBoxesOnMat(Mat frameMat, List<LabeledRect> faces)
     {
         frameMat.copyTo(outputMat);
-        for(Rect rect : faces.toArray())
+        for(LabeledRect labeledRect : faces)
         {
+            Rect rect = labeledRect.getRect();
             Point p1 = rect.tl();
             Point p2 = rect.br();
             Imgproc.rectangle(outputMat, p1, p2, rectColor, 5);
+
+            Point p3 = new Point(p1.x, p2.y + 50);
+            Imgproc.putText(outputMat, labeledRect.getLabel(), p3, Core.FONT_HERSHEY_TRIPLEX, 2d, rectColor);
         }
         return outputMat;
     }
