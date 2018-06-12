@@ -30,6 +30,12 @@ import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +76,8 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final String DATASET_KEY = "face_dataset";
     private static final String IS_DEFAULT_LABEL_KEY = "is_default_label";
 
+    private File faceDatasetFile = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -80,15 +88,28 @@ public class AddIdentityActivity extends AppCompatActivity
 
         labelField = findViewById(R.id.identityLabelField);
 
+
+
         //Load saved state
         if(savedInstanceState != null)
         {
             labelField.setText(savedInstanceState.getString(LABEL_TEXT_KEY));
             isDefaultLabel = savedInstanceState.getBoolean(IS_DEFAULT_LABEL_KEY);
-            for(Object faceDataObject : (Object[]) savedInstanceState.getSerializable(DATASET_KEY))
-            {
-                FaceData faceData = (FaceData) faceDataObject;
-                faceDataset.add(faceData);
+            String datasetPath = savedInstanceState.getString(DATASET_KEY);
+            if(datasetPath != null) {
+                faceDatasetFile = new File(datasetPath);
+                restoreFaceDataset();
+            }
+        }
+
+
+        //get tmp file to save faceDataset
+        if(faceDatasetFile == null) {
+            try {
+                File outputDir = getCacheDir(); // context being the Activity pointer
+                faceDatasetFile = File.createTempFile("prefix", "extension", outputDir);
+            } catch (IOException ex) {
+                Log.e(TAG, "Cannot create file to store face dataset");
             }
         }
 
@@ -117,13 +138,46 @@ public class AddIdentityActivity extends AppCompatActivity
         commitButton.setOnClickListener(view -> commitAddIdentity());
     }
 
+    private void saveFaceDataset() {
+        try(FileOutputStream fileOutputStream = new FileOutputStream(faceDatasetFile))
+        {
+            try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream))
+            {
+                objectOutputStream.writeObject(faceDataset);
+            }
+        }
+        catch(IOException ex)
+        {
+            Log.e(TAG, "Cannot write dataset on file");
+        }
+    }
+
+    private void restoreFaceDataset() {
+        try(FileInputStream fileInputStream = new FileInputStream(faceDatasetFile))
+        {
+            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream))
+            {
+                //noinspection unchecked
+                faceDataset = (List<FaceData>) objectInputStream.readObject();
+            }
+        }
+        catch(IOException ex)
+        {
+            Log.e(TAG, "Cannot read dataset from file");
+        }
+        catch(ClassNotFoundException ex)
+        {
+            Log.e(TAG, "Dataset is corrupted");
+        }
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putString(LABEL_TEXT_KEY, labelField.getText().toString());
         outState.putBoolean(IS_DEFAULT_LABEL_KEY, isDefaultLabel);
-        outState.putSerializable(DATASET_KEY, faceDataset.toArray());
+        outState.putString(DATASET_KEY, faceDatasetFile.getPath());
     }
 
     private void clearPlaceholderText()
@@ -264,7 +318,7 @@ public class AddIdentityActivity extends AppCompatActivity
         catch(Exception e)
         {
             Log.v(TAG, "Can't create file to take picture!");
-            Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG);
+            Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG).show();
             return;
         }
         cameraPictureUri = Uri.fromFile(cameraPictureFile);
@@ -301,6 +355,7 @@ public class AddIdentityActivity extends AppCompatActivity
             else if (requestCode == SHOOT_IMAGE)
             {
                 addImage(cameraPictureUri);
+                cameraPictureFile.delete();
             }
             else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
             {
