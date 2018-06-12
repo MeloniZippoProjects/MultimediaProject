@@ -16,6 +16,14 @@ public class FaceData implements Serializable
     protected Mat faceMat;
     protected float[] features;
 
+    public FaceData() {}
+
+    public FaceData(Mat faceMat, float[] features)
+    {
+        this.faceMat = faceMat;
+        this.features = features;
+    }
+
     //Bitmap conversion
     public Bitmap toBitmap()
     {
