@@ -62,6 +62,34 @@ public class DNNExtractor {
 
 		float[] features = new float[(int) prob.total()];
 		prob.get(0, 0, features);
-		return features;
+
+		return normalizeVector(features);
+	}
+
+
+	private float[] normalizeVector(float[] features)
+	{
+		float norm = 0;
+		for(float elem : features)
+		{
+			norm += elem*elem;
+		}
+
+		norm = (float)Math.sqrt(norm);
+
+		float[] normalizedVector = new float[features.length];
+
+		for(int i = 0; i < features.length; ++i)
+		{
+			normalizedVector[i] = features[i]/norm;
+		}
+
+		norm = 0;
+		for(float elem : normalizedVector)
+		{
+			norm += elem*elem;
+		}
+
+		return normalizedVector;
 	}
 }
