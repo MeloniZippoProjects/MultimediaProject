@@ -10,9 +10,13 @@ import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -30,12 +34,19 @@ public class FaceRecognitionApp extends Application {
             InternalStorageFiles.VGG_CAFFE_MODEL
     };
 
-    private static Context context;
+    private static FaceRecognitionApp appInstance = null;
+    private static FaceRecognitionApp getAppInstance()
+    {
+        return appInstance;
+    }
+
+    private Context context;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+        FaceRecognitionApp.appInstance = this;
         context = getApplicationContext();
 
         /* even if it is called initDebug it is not actually for debug
@@ -49,8 +60,18 @@ public class FaceRecognitionApp extends Application {
 
         copyFiles();
 
+        scheduledExecutorService.scheduleAtFixedRate(() -> {
+            System.gc();
+            System.runFinalization();
+        },
+                Parameters.GC_INTERVAL,
+                Parameters.GC_INTERVAL,
+                TimeUnit.SECONDS);
+
         initFaceRecognition();
     }
+
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private void copyFiles()
     {
@@ -92,6 +113,6 @@ public class FaceRecognitionApp extends Application {
 
     public static Context getAppContext()
     {
-        return context;
+        return appInstance.context;
     }
 }
