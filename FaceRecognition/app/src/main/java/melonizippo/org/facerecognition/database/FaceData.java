@@ -13,14 +13,14 @@ import org.opencv.core.Mat;
 
 public class FaceData implements Serializable
 {
-    protected Mat faceMat;
+    protected Mat faceMat = new Mat();
     protected float[] features;
 
     public FaceData() {}
 
     public FaceData(Mat faceMat, float[] features)
     {
-        this.faceMat = faceMat;
+        faceMat.copyTo(this.faceMat);
         this.features = features;
     }
 
@@ -47,7 +47,7 @@ public class FaceData implements Serializable
     }
 
     public void setFaceMat(Mat faceMat) {
-        this.faceMat = faceMat;
+        faceMat.copyTo(this.faceMat);
     }
 
     public float[] getFeatures() {

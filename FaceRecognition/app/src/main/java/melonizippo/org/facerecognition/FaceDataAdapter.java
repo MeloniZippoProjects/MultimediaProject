@@ -18,7 +18,7 @@ public class FaceDataAdapter extends ArrayAdapter<FaceData>
     private List<FaceData> dataSet;
     Context mContext;
 
-    public FaceDataAdapter(List<FaceData> data, Context context)
+    FaceDataAdapter(List<FaceData> data, Context context)
     {
         super(context, R.layout.face_preview, data);
         this.dataSet = data;
