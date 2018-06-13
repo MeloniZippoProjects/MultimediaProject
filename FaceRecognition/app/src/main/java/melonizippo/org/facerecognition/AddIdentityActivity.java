@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.icu.util.Calendar;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,10 +52,11 @@ import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 public class AddIdentityActivity extends AppCompatActivity
 {
     private static final String TAG = "AddIdentityActivity";
+
     private static final int PICK_IMAGE = 1;
     private static final int SHOOT_IMAGE = 2;
     private static final int PICK_IMAGE_MULTIPLE = 3;
-
+    private static final int REQUEST_VIDEO_CAPTURE = 4;
 
     private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
 
@@ -190,32 +192,6 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
-    private void showPictureDialog(){
-        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
-        pictureDialog.setTitle("Select Action");
-        String[] pictureDialogItems = {
-                "Select photo from gallery",
-                "Select multiple photos from gallery",
-                "Capture photo from camera" };
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                choosePhotosFromGallery();
-                                break;
-                            case 2:
-                                takePhotoFromCamera();
-                                break;
-                        }
-                    }
-                });
-        pictureDialog.show();
-    }
 
     private void commitAddIdentity()
     {
@@ -248,7 +224,7 @@ public class AddIdentityActivity extends AppCompatActivity
         if(
                 fd.knownIdentities.stream().anyMatch(
                         (dbIdentity) -> dbIdentity.label.matches(identityEntry.label))
-        )
+                )
         {
             showSnackBar(R.string.error_name_duplicate);
             return false;
@@ -290,6 +266,35 @@ public class AddIdentityActivity extends AppCompatActivity
         errorBar.show();
     }
 
+    private void showPictureDialog()
+    {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {
+                "Select photos from gallery",
+                "Capture photo from camera",
+                "Capture video from camera"
+        };
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotosFromGallery();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
+                            case 2:
+                                takeVideoFromCamera();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
+    }
+
     public void choosePhotoFromGallery()
     {
         Intent galleryIntent = new Intent(
@@ -298,7 +303,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
         startActivityForResult(galleryIntent, PICK_IMAGE);
     }
-    
+
     public void choosePhotosFromGallery()
     {
         Intent intent = new Intent();
@@ -343,6 +348,14 @@ public class AddIdentityActivity extends AppCompatActivity
         return pictureFile;
     }
 
+    private void takeVideoFromCamera()
+    {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -356,35 +369,60 @@ public class AddIdentityActivity extends AppCompatActivity
             else if (requestCode == SHOOT_IMAGE)
             {
                 addImage(cameraPictureUri);
-                cameraPictureFile.delete();
+                //Not deleting it makes the shot available for future use
+                //cameraPictureFile.delete();
             }
             else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
             {
-                if( data.getData() != null )
+                processImages(data);
+            }
+            else if (requestCode == REQUEST_VIDEO_CAPTURE && data != null)
+            {
+                processVideo(data);
+            }
+        }
+    }
+
+    private void processImages(Intent data)
+    {
+        if( data.getData() != null )
+        {
+            Uri imageUri = data.getData();
+            addImage(imageUri);
+        }
+        else
+        {
+            if (data.getClipData() != null)
+            {
+                ClipData clipData = data.getClipData();
+                int itemCount = clipData.getItemCount();
+                for (int i = 0; i < itemCount; i++)
                 {
-                    Uri imageUri = data.getData();
+                    Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
+                    ClipData.Item item = clipData.getItemAt(i);
+                    Uri imageUri = item.getUri();
                     addImage(imageUri);
-                }
-                else
-                {
-                    if (data.getClipData() != null)
-                    {
-                        ClipData clipData = data.getClipData();
-                        int itemCount = clipData.getItemCount();
-                        for (int i = 0; i < itemCount; i++)
-                        {
-                            Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
-                            ClipData.Item item = clipData.getItemAt(i);
-                            Uri imageUri = item.getUri();
-                            addImage(imageUri);
-                        }
-                    }
                 }
             }
         }
     }
 
-    private Mat imageMat = new Mat();
+    private void processVideo(Intent data)
+    {
+        Uri videoUri = data.getData();
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(this, videoUri);
+        String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        long duration = Long.parseLong(durationString) * 1000;
+        long step = duration / (Parameters.VIDEO_FRAMES_TO_EXTRACT + 1);
+
+        for(long time = step; time < duration; time += step)
+        {
+            Bitmap frame = retriever.getFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST);
+            addImage(frame);
+        }
+    }
+
     private void addImage(Uri imageUri)
     {
         Bitmap imageBitmap;
@@ -398,6 +436,12 @@ public class AddIdentityActivity extends AppCompatActivity
             return;
         }
 
+        addImage(imageBitmap);
+    }
+
+    private Mat imageMat = new Mat();
+    private void addImage(Bitmap imageBitmap)
+    {
         imageBitmap = scaleBitmap(imageBitmap);
 
         Utils.bitmapToMat(imageBitmap, imageMat);
