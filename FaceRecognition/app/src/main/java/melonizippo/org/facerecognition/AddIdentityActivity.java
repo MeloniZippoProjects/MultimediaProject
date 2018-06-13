@@ -178,6 +178,7 @@ public class AddIdentityActivity extends AppCompatActivity
         outState.putString(LABEL_TEXT_KEY, labelField.getText().toString());
         outState.putBoolean(IS_DEFAULT_LABEL_KEY, isDefaultLabel);
         outState.putString(DATASET_KEY, faceDatasetFile.getPath());
+        saveFaceDataset();
     }
 
     private void clearPlaceholderText()
