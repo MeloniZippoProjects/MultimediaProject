@@ -8,6 +8,7 @@ import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -33,6 +34,7 @@ import android.view.View;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import melonizippo.org.facerecognition.R;
@@ -55,6 +57,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private String currentCameraId;
     private CameraDevice currentCameraDevice;
 
+    private AutoFitSurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
     private ImageReader imageReader;
 
@@ -70,7 +73,8 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         cameraManager = getSystemService(CameraManager.class);
 
         //obtain surface holder
-        SurfaceView surfaceView = findViewById(R.id.camera_preview);
+        surfaceView = findViewById(R.id.camera_preview);
+        surfaceView.setAspectRatio(surfaceView.getWidth(),surfaceView.getHeight());
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(surfaceHolderCallback);
 
@@ -94,6 +98,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         public void surfaceCreated(SurfaceHolder holder) {
             //open front camera at startup
             openCamera(currentCameraId);
+
         }
 
         @Override
@@ -122,15 +127,14 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                     Log.e(TAG, "Configuration map is null");
                     return;
                 }
-                //todo: consider using yuv
-                //Size[] sizes = map.getOutputSizes(ImageFormat.JPEG);
-                //Size[] sizes1 = map.getOutputSizes(SurfaceHolder.class);
-                //Size[] sizes = map.getOutputSizes(ImageReader.class);
 
-                imageReader = ImageReader.newInstance(1080, 1920, ImageFormat.JPEG, 1);
+
+
+                imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 1);
                 imageReader.setOnImageAvailableListener(imageAvailableListener, null);
                 List<Surface> targets = new ArrayList<>();
                 targets.add(imageReader.getSurface());
+                //targets.add(surfaceHolder.getSurface());
                 currentCameraDevice.createCaptureSession(targets, captureSessionStateCallback, null);
 
                 return;
@@ -157,8 +161,14 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
             //create capture request
             try {
+
+                CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(currentCameraId);
+                int rotation = getOrientationDegrees();
+
                 CaptureRequest.Builder captureRequest = currentCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 captureRequest.addTarget(imageReader.getSurface());
+
+                //captureRequest.addTarget(surfaceHolder.getSurface());
                 session.setRepeatingRequest(captureRequest.build(), null, null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
@@ -187,9 +197,18 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.capacity()];
         buffer.get(bytes);
+
         Bitmap bitmapImage = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+        Matrix rotateMatrix = new Matrix();
+        rotateMatrix.setRotate(getOrientationDegrees(), bitmapImage.getWidth()/2, bitmapImage.getHeight());
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmapImage, 0, 0,
+                bitmapImage.getWidth(), bitmapImage.getHeight(),
+                rotateMatrix, false);
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap, surfaceView.getWidth(), surfaceView.getHeight(), false);
+
         image.close();
-        return bitmapImage;
+        return scaledBitmap;
     }
 
     public void openCamera(String cameraId) {
@@ -221,6 +240,26 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private int getOrientationDegrees()
+    {
+        int rotation = this.getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int degrees = 0;
+
+        switch (rotation)
+        {
+            case Surface.ROTATION_0: degrees = 90; break;
+            case Surface.ROTATION_90: degrees = 0; break;
+            case Surface.ROTATION_180: degrees = 270; break;
+            case Surface.ROTATION_270: degrees = 180; break;
+        }
+
+        if(currentCameraId.equals(FRONT_CAMERA))
+            degrees *= -1;
+
+        return degrees;
     }
 
 }
