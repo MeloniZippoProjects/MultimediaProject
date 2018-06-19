@@ -8,9 +8,28 @@
     tools:context=".streaming.Camera2FaceRecognition"
     tools:showIn="@layout/activity_camera2_face_recognition">
 
-    <melonizippo.org.facerecognition.streaming.AutoFitSurfaceView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/camera_preview"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        tools:layout_editor_absoluteX="0dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toTopOf="parent"
+            android:layout_weight="1"
+            android:background="@android:color/darker_gray"
+            android:text="TUAMAMMA"/>
+
+
+        <melonizippo.org.facerecognition.streaming.AutoFitSurfaceView
+            android:id="@+id/camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

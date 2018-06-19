@@ -31,13 +31,31 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.TextView;
+
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import melonizippo.org.facerecognition.FaceRecognitionApp;
 import melonizippo.org.facerecognition.R;
+import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
+import melonizippo.org.facerecognition.facerecognition.LabeledRect;
+import melonizippo.org.facerecognition.facerecognition.PredictedClass;
 
 public class Camera2FaceRecognition extends AppCompatActivity {
 
@@ -61,20 +79,31 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private SurfaceHolder surfaceHolder;
     private ImageReader imageReader;
 
+
+    //face recognition objects
+    public FaceDetector faceDetector;
+    public DNNExtractor extractor;
+    public KNNClassifier knnClassifier;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera2_face_recognition);
 
+        FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
+        faceDetector = app.faceDetector;
+        extractor = app.extractor;
+        knnClassifier = app.knnClassifier;
+
         //todo: get it from savedInstanceState
         currentCameraId = FRONT_CAMERA;
-
+        //currentCameraId = BACK_CAMERA;
         //obtain cameraManager instance
         cameraManager = getSystemService(CameraManager.class);
 
         //obtain surface holder
         surfaceView = findViewById(R.id.camera_preview);
-        surfaceView.setAspectRatio(surfaceView.getWidth(),surfaceView.getHeight());
+
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(surfaceHolderCallback);
 
@@ -96,9 +125,9 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
+            setLayout();
             //open front camera at startup
             openCamera(currentCameraId);
-
         }
 
         @Override
@@ -111,6 +140,33 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         }
     };
+
+    private void setLayout() {
+        int rotation = getWindowManager().getDefaultDisplay()
+                .getRotation();
+        int width = 0;
+        int height = 0;
+        switch (rotation)
+        {
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                    width = 3;
+                    height = 4;
+                break;
+            case Surface.ROTATION_90:
+            case Surface.ROTATION_270:
+                    width = 4;
+                    height = 3;
+                break;
+        }
+        surfaceView.setAspectRatio(width,height);
+
+        TextView textView = findViewById(R.id.text2);
+        View parent = (View) textView.getParent();
+        int textHeight = parent.getHeight() - surfaceView.getHeight();
+        textView.getLayoutParams().height = textHeight;
+        textView.requestLayout();
+    }
 
     private CameraDevice.StateCallback cameraCallback = new CameraDevice.StateCallback() {
         @Override
@@ -128,9 +184,11 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                     return;
                 }
 
+                Size[] sizes = map.getOutputSizes(ImageReader.class);
 
 
-                imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 1);
+
+                imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 5);
                 imageReader.setOnImageAvailableListener(imageAvailableListener, null);
                 List<Surface> targets = new ArrayList<>();
                 targets.add(imageReader.getSurface());
@@ -186,6 +244,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
             Bitmap bitmap = processImage(image);
+            image.close();
 
             Canvas canvas = surfaceHolder.lockCanvas();
             canvas.drawBitmap(bitmap, new Matrix(), null);
@@ -193,6 +252,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         }
     };
 
+    private Mat mImage = new Mat();
     private Bitmap processImage(Image image) {
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.capacity()];
@@ -205,9 +265,23 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 bitmapImage.getWidth(), bitmapImage.getHeight(),
                 rotateMatrix, false);
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap, surfaceView.getWidth(), surfaceView.getHeight(), false);
+        Utils.bitmapToMat(rotatedBitmap, mImage);
 
-        image.close();
+        //do face detection stuff
+        MatOfRect faces = faceDetector.detect(mImage);
+
+        if(faces.toArray().length != 0) {
+            List<LabeledRect> labeledRects = classifyFaces(mImage, faces);
+
+            //todo: if intruder, send alarm and store it
+
+            mImage = printFaceBoxesOnMat(mImage, labeledRects);
+        }
+
+        Bitmap processedBitmap = Bitmap.createBitmap(mImage.cols(), mImage.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mImage, processedBitmap);
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(processedBitmap, surfaceView.getWidth(), surfaceView.getHeight(), false);
         return scaledBitmap;
     }
 
@@ -240,6 +314,45 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 }
             }
         }
+    }
+
+
+    private static Mat faceMat = new Mat();
+    private List<LabeledRect> classifyFaces(Mat frameMat, MatOfRect faces)
+    {
+        List<LabeledRect> labeledRects = new LinkedList<>();
+
+        for(Rect face : faces.toArray())
+        {
+            faceMat = frameMat.submat(face);
+            //float[] faceFeatures = extractor.extract(faceMat);
+            //FaceData query = new FaceData(faceMat, faceFeatures);
+            //PredictedClass predict = knnClassifier.predict(query);
+
+            //LabeledRect labeledRect = new LabeledRect(face, predict.getLabel() + "(" + predict.getConfidence() + ")", predict.getConfidence());
+            LabeledRect labeledRect = new LabeledRect(face, "enrico" + "(" + 1 + ")", 1d);
+            labeledRects.add(labeledRect);
+        }
+
+        return labeledRects;
+    }
+
+    private static Mat outputMat = new Mat();
+    private static Scalar rectColor = new Scalar(255, 255, 255, 255);
+    private Mat printFaceBoxesOnMat(Mat frameMat, List<LabeledRect> faces)
+    {
+        frameMat.copyTo(outputMat);
+        for(LabeledRect labeledRect : faces)
+        {
+            Rect rect = labeledRect.getRect();
+            Point p1 = rect.tl();
+            Point p2 = rect.br();
+            Imgproc.rectangle(outputMat, p1, p2, rectColor, 5);
+
+            Point p3 = new Point(p1.x, p2.y + 50);
+            Imgproc.putText(outputMat, labeledRect.getLabel(), p3, Core.FONT_HERSHEY_TRIPLEX, 2d, rectColor);
+        }
+        return outputMat;
     }
 
     private int getOrientationDegrees()
