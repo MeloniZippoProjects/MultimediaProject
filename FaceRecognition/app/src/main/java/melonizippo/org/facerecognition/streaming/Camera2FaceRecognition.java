@@ -160,12 +160,13 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 break;
         }
         surfaceView.setAspectRatio(width,height);
-
+        /*
         TextView textView = findViewById(R.id.text2);
         View parent = (View) textView.getParent();
         int textHeight = parent.getHeight() - surfaceView.getHeight();
         textView.getLayoutParams().height = textHeight;
         textView.requestLayout();
+        */
     }
 
     private CameraDevice.StateCallback cameraCallback = new CameraDevice.StateCallback() {
