@@ -1,5 +1,7 @@
 package melonizippo.org.facerecognition.facerecognition;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -44,12 +46,17 @@ public class FaceDetectionExecutor {
     private static Mat faceMat = new Mat();
     public boolean classifyFaces(Mat frameMat, MatOfRect faces)
     {
-
         if(!classifying.tryAcquire())
             return false;
 
         Runnable task = () -> {
             try {
+                if(faces.toList().size() == 0)
+                {
+                    updateLabel("No face detected");
+                    return;
+                }
+
                 List<LabeledRect> labeledRects = new LinkedList<>();
 
                 for (Rect face : faces.toArray()) {
@@ -63,14 +70,13 @@ public class FaceDetectionExecutor {
                     labeledRects.add(labeledRect);
                 }
 
+                StringBuilder stringBuilder = new StringBuilder("");
                 for (LabeledRect labeledRect : labeledRects) {
-                    //labelBuffer.append(labeledRect.getLabel()).append("\n").append(textView.getText());
-                    //textView.setText(labelBuffer.toString());
-                    //textView.requestLayout();
-
-                    //todo: only threads which create the view hierarchy can access this view
-                    textView.append(labeledRect.getLabel() + "\n");
+                    stringBuilder.append(labeledRect.getLabel()).append("\n");
                 }
+
+                updateLabel(stringBuilder.toString());
+
             }
             catch(Exception ex)
             {
@@ -84,5 +90,14 @@ public class FaceDetectionExecutor {
         executorService.submit(task);
 
         return true;
+    }
+
+    private void updateLabel(String newLabel)
+    {
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            mainHandler.post(() -> {
+            textView.setText(String.format("%s\n", newLabel));
+        });
     }
 }

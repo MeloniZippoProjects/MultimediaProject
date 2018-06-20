@@ -271,15 +271,12 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         //do face detection stuff
         MatOfRect faces = faceDetector.detect(mImage);
 
-        if(faces.toArray().length != 0) {
-            mImage = printFaceBoxesOnMat(mImage, faces.toList());
-            //List<LabeledRect> labeledRects = classifyFaces(mImage, faces);
+         mImage = printFaceBoxesOnMat(mImage, faces.toList());
 
-            if(executorService.classifyFaces(mImage, faces))
-                Log.d(TAG, "Queued an image for labeling");
+        if(executorService.classifyFaces(mImage, faces))
+            Log.d(TAG, "Queued an image for labeling");
 
-            //todo: if intruder, send alarm and store it
-        }
+        //todo: if intruder, send alarm and store it
 
         Bitmap processedBitmap = Bitmap.createBitmap(mImage.cols(), mImage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mImage, processedBitmap);
@@ -323,6 +320,9 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private static Scalar rectColor = new Scalar(255, 255, 255, 255);
     private Mat printFaceBoxesOnMat(Mat frameMat, List<Rect> faces)
     {
+        if(faces.size() == 0)
+            return frameMat;
+
         frameMat.copyTo(outputMat);
         for(Rect rect : faces)
         {
