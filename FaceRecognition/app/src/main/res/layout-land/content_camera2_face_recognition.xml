@@ -22,12 +22,11 @@
             android:layout_height="match_parent" />
 
         <TextView
-            android:id="@+id/text2"
+            android:id="@+id/faceLabel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/darker_gray"
-            android:text="TUAMAMMA" />
+            android:text=""/>
 
     </LinearLayout>
 

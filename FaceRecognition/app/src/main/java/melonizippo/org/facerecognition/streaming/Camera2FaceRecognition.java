@@ -31,6 +31,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.opencv.android.Utils;
@@ -47,11 +48,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import melonizippo.org.facerecognition.FaceRecognitionApp;
 import melonizippo.org.facerecognition.R;
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.facerecognition.FaceDetectionExecutor;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 import melonizippo.org.facerecognition.facerecognition.LabeledRect;
@@ -79,11 +83,12 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private SurfaceHolder surfaceHolder;
     private ImageReader imageReader;
 
+    private TextView textView;
+
+    private FaceDetectionExecutor executorService;
 
     //face recognition objects
     public FaceDetector faceDetector;
-    public DNNExtractor extractor;
-    public KNNClassifier knnClassifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +97,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
         faceDetector = app.faceDetector;
-        extractor = app.extractor;
-        knnClassifier = app.knnClassifier;
 
         //todo: get it from savedInstanceState
         currentCameraId = FRONT_CAMERA;
@@ -106,6 +109,10 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(surfaceHolderCallback);
+
+        textView = findViewById(R.id.faceLabel);
+
+        executorService = new FaceDetectionExecutor(app, textView);
 
 
         //graphic settings
@@ -160,13 +167,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 break;
         }
         surfaceView.setAspectRatio(width,height);
-        /*
-        TextView textView = findViewById(R.id.text2);
-        View parent = (View) textView.getParent();
-        int textHeight = parent.getHeight() - surfaceView.getHeight();
-        textView.getLayoutParams().height = textHeight;
-        textView.requestLayout();
-        */
     }
 
     private CameraDevice.StateCallback cameraCallback = new CameraDevice.StateCallback() {
@@ -272,11 +272,13 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         MatOfRect faces = faceDetector.detect(mImage);
 
         if(faces.toArray().length != 0) {
-            List<LabeledRect> labeledRects = classifyFaces(mImage, faces);
+            mImage = printFaceBoxesOnMat(mImage, faces.toList());
+            //List<LabeledRect> labeledRects = classifyFaces(mImage, faces);
+
+            if(executorService.classifyFaces(mImage, faces))
+                Log.d(TAG, "Queued an image for labeling");
 
             //todo: if intruder, send alarm and store it
-
-            mImage = printFaceBoxesOnMat(mImage, labeledRects);
         }
 
         Bitmap processedBitmap = Bitmap.createBitmap(mImage.cols(), mImage.rows(), Bitmap.Config.ARGB_8888);
@@ -317,41 +319,16 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         }
     }
 
-
-    private static Mat faceMat = new Mat();
-    private List<LabeledRect> classifyFaces(Mat frameMat, MatOfRect faces)
-    {
-        List<LabeledRect> labeledRects = new LinkedList<>();
-
-        for(Rect face : faces.toArray())
-        {
-            faceMat = frameMat.submat(face);
-            //float[] faceFeatures = extractor.extract(faceMat);
-            //FaceData query = new FaceData(faceMat, faceFeatures);
-            //PredictedClass predict = knnClassifier.predict(query);
-
-            //LabeledRect labeledRect = new LabeledRect(face, predict.getLabel() + "(" + predict.getConfidence() + ")", predict.getConfidence());
-            LabeledRect labeledRect = new LabeledRect(face, "enrico" + "(" + 1 + ")", 1d);
-            labeledRects.add(labeledRect);
-        }
-
-        return labeledRects;
-    }
-
     private static Mat outputMat = new Mat();
     private static Scalar rectColor = new Scalar(255, 255, 255, 255);
-    private Mat printFaceBoxesOnMat(Mat frameMat, List<LabeledRect> faces)
+    private Mat printFaceBoxesOnMat(Mat frameMat, List<Rect> faces)
     {
         frameMat.copyTo(outputMat);
-        for(LabeledRect labeledRect : faces)
+        for(Rect rect : faces)
         {
-            Rect rect = labeledRect.getRect();
             Point p1 = rect.tl();
             Point p2 = rect.br();
             Imgproc.rectangle(outputMat, p1, p2, rectColor, 5);
-
-            Point p3 = new Point(p1.x, p2.y + 50);
-            Imgproc.putText(outputMat, labeledRect.getLabel(), p3, Core.FONT_HERSHEY_TRIPLEX, 2d, rectColor);
         }
         return outputMat;
     }
