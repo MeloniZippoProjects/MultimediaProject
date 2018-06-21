@@ -84,7 +84,9 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
     private AutoFitSurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
+    private Canvas canvas;
     private ImageReader imageReader;
+    private CameraCaptureSession cameraCaptureSession;
 
     private TextView textView;
 
@@ -102,8 +104,11 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         faceDetector = app.faceDetector;
 
         //todo: get it from savedInstanceState
-        currentCameraId = FRONT_CAMERA;
-        //currentCameraId = BACK_CAMERA;
+        if(savedInstanceState != null)
+            currentCameraId = savedInstanceState.getString("currentCamera");
+        else
+            currentCameraId = FRONT_CAMERA;
+
         //obtain cameraManager instance
         cameraManager = getSystemService(CameraManager.class);
 
@@ -133,6 +138,42 @@ public class Camera2FaceRecognition extends AppCompatActivity {
             toggleJavaCameraView();
         });
     }
+
+    private void toggleJavaCameraView() {
+        if(currentCameraId.equals(FRONT_CAMERA))
+            currentCameraId = BACK_CAMERA;
+        else
+            currentCameraId = FRONT_CAMERA;
+
+        //close previous captureSession
+        cameraCaptureSession.close();
+        imageReader.close();
+        currentCameraDevice.close();
+
+        openCamera(currentCameraId);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outstate) {
+        super.onSaveInstanceState(outstate);
+        outstate.putString("currentCamera", currentCameraId);
+        Log.d(TAG, "save instance state");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "on pause");
+        if(canvas != null)
+            surfaceHolder.unlockCanvasAndPost(canvas);
+        imageReader.close();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "on resume");
     }
 
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
@@ -195,10 +236,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
                 imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 5);
                 imageReader.setOnImageAvailableListener(imageAvailableListener, null);
-                List<Surface> targets = new ArrayList<>();
-                targets.add(imageReader.getSurface());
-                //targets.add(surfaceHolder.getSurface());
-                currentCameraDevice.createCaptureSession(targets, captureSessionStateCallback, null);
+                createCaptureSession();
 
                 return;
             } catch (CameraAccessException e) {
@@ -217,21 +255,23 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         }
     };
 
+    private void createCaptureSession() throws CameraAccessException {
+        List<Surface> targets = new ArrayList<>();
+        targets.add(imageReader.getSurface());
+        currentCameraDevice.createCaptureSession(targets, captureSessionStateCallback, null);
+    }
+
     private CameraCaptureSession.StateCallback captureSessionStateCallback = new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
             Log.d(TAG, "configured capture session");
 
+            cameraCaptureSession = session;
+
             //create capture request
             try {
-
-                CameraCharacteristics cameraCharacteristics = cameraManager.getCameraCharacteristics(currentCameraId);
-                int rotation = getOrientationDegrees();
-
                 CaptureRequest.Builder captureRequest = currentCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 captureRequest.addTarget(imageReader.getSurface());
-
-                //captureRequest.addTarget(surfaceHolder.getSurface());
                 session.setRepeatingRequest(captureRequest.build(), null, null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
@@ -251,9 +291,10 @@ public class Camera2FaceRecognition extends AppCompatActivity {
             Bitmap bitmap = processImage(image);
             image.close();
 
-            Canvas canvas = surfaceHolder.lockCanvas();
+            canvas = surfaceHolder.lockCanvas();
             canvas.drawBitmap(bitmap, new Matrix(), null);
             surfaceHolder.unlockCanvasAndPost(canvas);
+            canvas = null;
         }
     };
 
