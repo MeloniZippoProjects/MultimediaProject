@@ -1,6 +1,7 @@
 package melonizippo.org.facerecognition.streaming;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -51,7 +52,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import melonizippo.org.facerecognition.FaceRecognitionActivity;
 import melonizippo.org.facerecognition.FaceRecognitionApp;
+import melonizippo.org.facerecognition.IdentitiesEditorActivity;
 import melonizippo.org.facerecognition.R;
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
@@ -114,19 +117,22 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         executorService = new FaceDetectionExecutor(app, textView);
 
-
         //graphic settings
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+
+        FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
+        identitiesEditor.setOnClickListener(view -> {
+            Intent intent = new Intent(Camera2FaceRecognition.this, IdentitiesEditorActivity.class);
+            startActivity(intent);
         });
+
+        FloatingActionButton switchCamera = findViewById(R.id.switchCamera);
+        switchCamera.setOnClickListener(view -> {
+            toggleJavaCameraView();
+        });
+    }
     }
 
     private SurfaceHolder.Callback surfaceHolderCallback = new SurfaceHolder.Callback() {
@@ -186,8 +192,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
                 }
 
                 Size[] sizes = map.getOutputSizes(ImageReader.class);
-
-
 
                 imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 5);
                 imageReader.setOnImageAvailableListener(imageAvailableListener, null);

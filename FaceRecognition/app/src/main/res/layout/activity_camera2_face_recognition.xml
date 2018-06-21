@@ -23,11 +23,22 @@
     <include layout="@layout/content_camera2_face_recognition" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/goToIdentitiesEditor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@android:drawable/ic_menu_camera"
+    />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/switchCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/fab_margin"
+
+        app:srcCompat="@android:drawable/ic_menu_rotate"
+    />
 
 </android.support.design.widget.CoordinatorLayout>
