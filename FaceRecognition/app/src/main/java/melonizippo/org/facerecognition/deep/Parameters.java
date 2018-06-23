@@ -39,7 +39,7 @@ public class Parameters {
 
 
 	//k-Nearest Neighbors
-	public static final int K = 10;
+	public static final int K = 11;
 	public static final double MIN_CONFIDENCE = 0.6;
 	
 	//Face Detection Parameters

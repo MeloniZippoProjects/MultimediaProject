@@ -82,21 +82,21 @@ public class KNNClassifier {
 	private PredictedClass getBestLabel(List<Map.Entry<Double,LabeledFaceData>> results) {
 		//Loop in the results list and retrieve the best label
 
-		HashMap<String, Integer> labelCounts = new HashMap<>();
+		HashMap<String, Double> labelScores = new HashMap<>();
 		HashMap<String, Double> bestLabelsScore = new HashMap<>();
 
 		for(Map.Entry<Double,LabeledFaceData> descriptor : results)
 		{
 			String label = descriptor.getValue().getLabel();
-			Integer labelCount = labelCounts.getOrDefault(label, 0);
-			labelCounts.put(label, labelCount + 1);
+			Double currentLabelScore = labelScores.getOrDefault(label, 0d);
+			labelScores.put(label, currentLabelScore + descriptor.getKey());
 
-			Double currentLabelScore = bestLabelsScore.getOrDefault(label, 0d);
-			if(descriptor.getKey() > currentLabelScore)
+			Double currentBestLabelScore = bestLabelsScore.getOrDefault(label, 0d);
+			if(descriptor.getKey() > currentBestLabelScore)
 				bestLabelsScore.put(label, descriptor.getKey());
 		}
 
-		Optional<Map.Entry<String,Integer>> bestLabelOptional = labelCounts.entrySet().stream().
+		Optional<Map.Entry<String,Double>> bestLabelOptional = labelScores.entrySet().stream().
 				max(Comparator.comparing(Map.Entry::getValue));
 
 		if(bestLabelOptional.isPresent())
