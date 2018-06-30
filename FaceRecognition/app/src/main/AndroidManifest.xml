@@ -30,12 +30,6 @@
         </provider>
 
         <activity
-            android:name=".ImageMatTestActivity"
-            android:label="@string/title_activity_prova"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".FaceRecognitionActivity">
-        </activity>
-        <activity
             android:name=".IdentitiesViewActivity"
             android:label="@string/title_activity_identities_editor"
             android:theme="@style/AppTheme.NoActionBar" />

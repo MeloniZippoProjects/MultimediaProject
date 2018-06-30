@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">FaceRecognition</string>
-    <string name="title_activity_prova">ProvaActivity</string>
-    <string name="title_activity_identities_editor">IdentitiesEditorActivity</string>
-    <string name="title_activity_add_identity">AddIdentityActivity</string>
+    <string name="title_activity_identities_editor">Identities in database</string>
+    <string name="title_activity_add_identity">Register new identity</string>
 
     <!-- AddIdentity -->
     <string name="labelPlaceholder">Insert name</string>
