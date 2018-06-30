@@ -90,8 +90,6 @@ public class AddIdentityActivity extends AppCompatActivity
 
         labelField = findViewById(R.id.identityLabelField);
 
-
-
         //Load saved state
         if(savedInstanceState != null)
         {
@@ -103,7 +101,6 @@ public class AddIdentityActivity extends AppCompatActivity
                 restoreFaceDataset();
             }
         }
-
 
         //get tmp file to save faceDataset
         if(faceDatasetFile == null) {

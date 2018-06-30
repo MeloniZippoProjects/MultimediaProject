@@ -18,5 +18,7 @@
     <string name="addSamplesButtonText">Add</string>
     <string name="saveIdentityButtonText">Save</string>
     <string name="clearFormButtonText">Clear</string>
+    <string name="AuthorizedText">Authorized</string>
+    <string name="NonAuthorizedText">Not authorized</string>
 
 </resources>

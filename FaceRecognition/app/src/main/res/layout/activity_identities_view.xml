@@ -23,7 +23,7 @@
                 android:background="?android:attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <include layout="@layout/content_identities_editor" />
+            <include layout="@layout/content_identities_view" />
 
         </LinearLayout>
 

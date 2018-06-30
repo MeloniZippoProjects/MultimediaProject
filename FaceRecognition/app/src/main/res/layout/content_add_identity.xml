@@ -41,8 +41,6 @@
             android:layout_weight="1"
 
             android:numColumns="3"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
         />
 
         <LinearLayout

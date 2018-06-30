@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -40,6 +41,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+    private IdentityEntryAdapter identityEntryAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,6 +56,12 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_save);
+
+        //Setup list view
+        FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
+        identityEntryAdapter = new IdentityEntryAdapter(db.knownIdentities, getApplicationContext());
+        ListView identitiesView = findViewById(R.id.identitiesView);
+        identitiesView.setAdapter(identityEntryAdapter);
 
         FloatingActionButton addIdentityButton = findViewById(R.id.addIdentity);
         addIdentityButton.setOnClickListener((view) -> {
