@@ -5,46 +5,78 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".AddIdentityActivity"
     tools:showIn="@layout/activity_add_identity">
 
-    <android.support.design.widget.TextInputEditText
-        android:id="@+id/identityLabelField"
-        android:text="@string/labelPlaceholder"
-
-        android:focusedByDefault="false"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/identityLabelField"
+            android:text="@string/labelPlaceholder"
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+            android:focusedByDefault="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+        />
 
-    <CheckBox
-        android:id="@+id/sendAlertCheckbox"
-        android:text="@string/alarmCheckBoxText"
+        <CheckBox
+            android:id="@+id/sendAlertCheckbox"
+            android:text="@string/sendAlertCheckBoxText"
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        />
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/identityLabelField"/>
 
-    <GridView
-        android:id="@+id/previewsView"
+        <GridView
+            android:id="@+id/previewsView"
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numColumns="3"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendAlertCheckbox"
-    />
+            android:numColumns="3"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+        />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            style="?android:buttonBarStyle">
+            <Button
+                android:id="@+id/clearFormButton"
+                android:text="@string/clearFormButtonText"
+
+                style="?android:buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+            />
+            <Button
+                android:id="@+id/saveIdentityButton"
+                android:text="@string/saveIdentityButtonText"
+
+                style="?android:buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+            />
+            <Button
+                android:id="@+id/addSamplesButton"
+                android:text="@string/addSamplesButtonText"
+
+                style="?android:buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+            />
+        </LinearLayout>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

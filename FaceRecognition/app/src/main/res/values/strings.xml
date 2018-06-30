@@ -6,7 +6,7 @@
 
     <!-- AddIdentity -->
     <string name="labelPlaceholder">Insert name</string>
-    <string name="alarmCheckBoxText">Start alarm when detected</string>
+    <string name="sendAlertCheckBoxText">Start alarm when detected</string>
 
     <string name="info_add_success">Identity added to database</string>
     <string name="error_no_name">Must specify a name</string>
@@ -15,5 +15,9 @@
     <string name="importTitle">Import database</string>
     <string name="exportTitle">Export database</string>
     <string name="title_activity_camera2_face_recognition">Camera2FaceRecognition</string>
+    <string name="clearDatabase">Clear database</string>
+    <string name="addSamplesButtonText">Add</string>
+    <string name="saveIdentityButtonText">Save</string>
+    <string name="clearFormButtonText">Clear</string>
 
 </resources>

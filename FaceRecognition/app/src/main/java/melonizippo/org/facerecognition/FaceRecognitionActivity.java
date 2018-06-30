@@ -23,7 +23,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class FaceRecognitionActivity extends AppCompatActivity implements Camera
 
         FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
         identitiesEditor.setOnClickListener(view -> {
-            Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesEditorActivity.class);
+            Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesViewActivity.class);
             startActivity(intent);
         });
 

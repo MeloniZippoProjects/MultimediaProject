@@ -29,7 +29,7 @@ import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.IdentityEntry;
 
-public class IdentitiesEditorActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
+public class IdentitiesViewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
     private static final String EXPORTED_DATABASE_NAME = "FaceRecognition_database.dat";
     private static final String TAG = "IdentitiesEditor";
@@ -45,7 +45,7 @@ public class IdentitiesEditorActivity extends AppCompatActivity implements Navig
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_identities_editor);
+        setContentView(R.layout.activity_identities_view);
 
         verifyStoragePermissions(this);
 
@@ -57,14 +57,8 @@ public class IdentitiesEditorActivity extends AppCompatActivity implements Navig
 
         FloatingActionButton addIdentityButton = findViewById(R.id.addIdentity);
         addIdentityButton.setOnClickListener((view) -> {
-                Intent intent = new Intent(IdentitiesEditorActivity.this, AddIdentityActivity.class);
+                Intent intent = new Intent(IdentitiesViewActivity.this, AddIdentityActivity.class);
                 startActivity(intent);
-        });
-
-        FloatingActionButton clearDatabaseButton = findViewById(R.id.clearDatabaseButton);
-        clearDatabaseButton.setOnClickListener((view) -> {
-            FaceDatabaseStorage.clear();
-            updateText();
         });
 
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -97,10 +91,20 @@ public class IdentitiesEditorActivity extends AppCompatActivity implements Navig
             case R.id.importItem:
                 importDatabase();
                 break;
+            case R.id.clearDatabase:
+                clearDatabase();
+                break;
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        updateText();
     }
 
     public static void verifyStoragePermissions(Activity activity) {
@@ -170,10 +174,9 @@ public class IdentitiesEditorActivity extends AppCompatActivity implements Navig
         return true;
     }
 
-    @Override
-    protected void onResume()
+    private void clearDatabase()
     {
-        super.onResume();
+        FaceDatabaseStorage.clear();
         updateText();
     }
 

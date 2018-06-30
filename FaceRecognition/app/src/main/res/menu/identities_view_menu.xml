@@ -11,5 +11,10 @@
             android:icon="@android:drawable/ic_menu_upload"
             android:title="@string/exportTitle"
             />
+        <item
+            android:id="@+id/clearDatabase"
+            android:icon="@android:drawable/ic_delete"
+            android:title="@string/clearDatabase"
+            />
     </group>
 </menu>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".IdentitiesEditorActivity"
+    tools:context=".IdentitiesViewActivity"
     android:id="@+id/drawerLayout">
 
     <FrameLayout
@@ -19,21 +19,13 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:layout_height="?android:attr/actionBarSize"
+                android:background="?android:attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             <include layout="@layout/content_identities_editor" />
 
         </LinearLayout>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/clearDatabaseButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|left"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_menu_revert" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/addIdentity"
@@ -51,6 +43,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_view"
+        app:menu="@menu/identities_view_menu"
         />
 </android.support.v4.widget.DrawerLayout>

@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -22,7 +20,6 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,13 +27,9 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
@@ -46,23 +39,13 @@ import org.opencv.imgproc.Imgproc;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import melonizippo.org.facerecognition.FaceRecognitionActivity;
 import melonizippo.org.facerecognition.FaceRecognitionApp;
-import melonizippo.org.facerecognition.IdentitiesEditorActivity;
+import melonizippo.org.facerecognition.IdentitiesViewActivity;
 import melonizippo.org.facerecognition.R;
-import melonizippo.org.facerecognition.database.FaceData;
-import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.facerecognition.FaceDetectionExecutor;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
-import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
-import melonizippo.org.facerecognition.facerecognition.LabeledRect;
-import melonizippo.org.facerecognition.facerecognition.PredictedClass;
 
 public class Camera2FaceRecognition extends AppCompatActivity {
 
@@ -129,7 +112,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
         identitiesEditor.setOnClickListener(view -> {
-            Intent intent = new Intent(Camera2FaceRecognition.this, IdentitiesEditorActivity.class);
+            Intent intent = new Intent(Camera2FaceRecognition.this, IdentitiesViewActivity.class);
             startActivity(intent);
         });
 

@@ -1,5 +1,6 @@
 package melonizippo.org.facerecognition;
 
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +34,6 @@ import org.opencv.core.Rect;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -127,17 +127,17 @@ public class AddIdentityActivity extends AppCompatActivity
         previewsView.setAdapter(faceDataAdapter);
 
         //Setup listeners
-        FloatingActionButton addPhotosButton = findViewById(R.id.addPhotosButton);
-        addPhotosButton.setOnClickListener((view) -> showPictureDialog());
+        Button addSamplesButton = findViewById(R.id.addSamplesButton);
+        addSamplesButton.setOnClickListener((view) -> showPictureDialog());
 
-        FloatingActionButton clearFormButton = findViewById(R.id.clearFormButton);
+        Button clearFormButton = findViewById(R.id.clearFormButton);
         clearFormButton.setOnClickListener((view) -> clearForm());
 
         labelField.setOnClickListener(view -> clearPlaceholderText());
         labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
 
-        final Button commitButton = findViewById(R.id.commitButton);
-        commitButton.setOnClickListener(view -> commitAddIdentity());
+        Button saveIdentityButton = findViewById(R.id.saveIdentityButton);
+        saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
     }
 
     private void saveFaceDataset() {
