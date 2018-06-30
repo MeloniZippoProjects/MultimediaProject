@@ -1,6 +1,5 @@
 package melonizippo.org.facerecognition;
 
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.FileProvider;
@@ -54,11 +52,13 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final String TAG = "AddIdentityActivity";
 
     private static final int PICK_IMAGE = 1;
-    private static final int SHOOT_IMAGE = 2;
-    private static final int PICK_IMAGE_MULTIPLE = 3;
-    private static final int REQUEST_VIDEO_CAPTURE = 4;
+    private static final int PICK_IMAGE_MULTIPLE = 2;
+    private static final int PICK_VIDEO = 3;
+    private static final int SHOOT_IMAGE = 4;
+    private static final int SHOOT_VIDEO = 5;
 
     private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
+
 
     private boolean isDefaultLabel = true;
 
@@ -269,8 +269,9 @@ public class AddIdentityActivity extends AppCompatActivity
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
                 "Select photos from gallery",
+                "Select video from gallery",
                 "Capture photo from camera",
-                "Capture video from camera"
+                "Capture video from camera",
         };
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
@@ -281,9 +282,12 @@ public class AddIdentityActivity extends AppCompatActivity
                                 choosePhotosFromGallery();
                                 break;
                             case 1:
-                                takePhotoFromCamera();
+                                chooseVideoFromGallery();
                                 break;
                             case 2:
+                                takePhotoFromCamera();
+                                break;
+                            case 3:
                                 takeVideoFromCamera();
                                 break;
                         }
@@ -308,6 +312,14 @@ public class AddIdentityActivity extends AppCompatActivity
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE_MULTIPLE);
+    }
+
+    private void chooseVideoFromGallery()
+    {
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent,"Select Video"), PICK_VIDEO);
     }
 
     private void takePhotoFromCamera()
@@ -349,7 +361,7 @@ public class AddIdentityActivity extends AppCompatActivity
     {
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+            startActivityForResult(takeVideoIntent, SHOOT_VIDEO);
         }
     }
 
@@ -373,7 +385,7 @@ public class AddIdentityActivity extends AppCompatActivity
             {
                 processImages(data);
             }
-            else if (requestCode == REQUEST_VIDEO_CAPTURE && data != null)
+            else if ( (requestCode == SHOOT_VIDEO || requestCode == PICK_VIDEO) && data != null)
             {
                 processVideo(data);
             }
