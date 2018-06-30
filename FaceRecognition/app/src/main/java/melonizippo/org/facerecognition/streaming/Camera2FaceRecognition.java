@@ -151,6 +151,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         if(canvas != null)
             surfaceHolder.unlockCanvasAndPost(canvas);
         imageReader.close();
+        cameraCaptureSession.close();
     }
 
     @Override
@@ -174,7 +175,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
-
         }
     };
 
@@ -252,11 +252,14 @@ public class Camera2FaceRecognition extends AppCompatActivity {
             cameraCaptureSession = session;
 
             //create capture request
-            try {
+            try
+            {
                 CaptureRequest.Builder captureRequest = currentCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 captureRequest.addTarget(imageReader.getSurface());
                 session.setRepeatingRequest(captureRequest.build(), null, null);
-            } catch (CameraAccessException e) {
+            }
+            catch (CameraAccessException e)
+            {
                 e.printStackTrace();
             }
         }
