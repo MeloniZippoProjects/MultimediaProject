@@ -70,7 +70,7 @@ public class BOWTrainer {
     //javadoc: BOWTrainer::getDescriptors()
     public  List<Mat> getDescriptors()
     {
-        List<Mat> retVal = new ArrayList<Mat>();
+        List<Mat> retVal = new ArrayList<>();
         Mat retValMat = new Mat(getDescriptors_0(nativeObj));
         Converters.Mat_to_vector_Mat(retValMat, retVal);
         return retVal;

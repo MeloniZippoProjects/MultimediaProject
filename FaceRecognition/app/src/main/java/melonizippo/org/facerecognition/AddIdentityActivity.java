@@ -1,7 +1,6 @@
 package melonizippo.org.facerecognition;
 
 import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -274,23 +273,21 @@ public class AddIdentityActivity extends AppCompatActivity
                 "Capture video from camera",
         };
         pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotosFromGallery();
-                                break;
-                            case 1:
-                                chooseVideoFromGallery();
-                                break;
-                            case 2:
-                                takePhotoFromCamera();
-                                break;
-                            case 3:
-                                takeVideoFromCamera();
-                                break;
-                        }
+                (dialog, which) ->
+                {
+                    switch (which) {
+                        case 0:
+                            choosePhotosFromGallery();
+                            break;
+                        case 1:
+                            chooseVideoFromGallery();
+                            break;
+                        case 2:
+                            takePhotoFromCamera();
+                            break;
+                        case 3:
+                            takeVideoFromCamera();
+                            break;
                     }
                 });
         pictureDialog.show();
@@ -328,7 +325,7 @@ public class AddIdentityActivity extends AppCompatActivity
         try
         {
             // place where to store camera taken picture
-            cameraPictureFile = this.createPictureFile("picture", ".jpg");
+            cameraPictureFile = this.createPictureFile();
         }
         catch(Exception e)
         {
@@ -348,10 +345,10 @@ public class AddIdentityActivity extends AppCompatActivity
         startActivityForResult(intent, SHOOT_IMAGE);
     }
 
-    private File createPictureFile(String part, String ext) throws Exception
+    private File createPictureFile() throws Exception
     {
         File picturesDir= getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        String name = part + Calendar.getInstance().getTimeInMillis() + ext;
+        String name = "picture" + Calendar.getInstance().getTimeInMillis() + ".jpg";
         File pictureFile = new File(picturesDir, name);
         pictureFile.createNewFile();
         return pictureFile;

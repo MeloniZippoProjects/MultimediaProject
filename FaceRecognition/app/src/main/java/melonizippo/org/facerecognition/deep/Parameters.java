@@ -1,7 +1,5 @@
 package melonizippo.org.facerecognition.deep;
 
-import java.io.File;
-
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 

@@ -284,9 +284,9 @@ public class Calib3d {
     //javadoc: initCameraMatrix2D(objectPoints, imagePoints, imageSize, aspectRatio)
     public static Mat initCameraMatrix2D(List<MatOfPoint3f> objectPoints, List<MatOfPoint2f> imagePoints, Size imageSize, double aspectRatio)
     {
-        List<Mat> objectPoints_tmplm = new ArrayList<Mat>((objectPoints != null) ? objectPoints.size() : 0);
+        List<Mat> objectPoints_tmplm = new ArrayList<>((objectPoints != null) ? objectPoints.size() : 0);
         Mat objectPoints_mat = Converters.vector_vector_Point3f_to_Mat(objectPoints, objectPoints_tmplm);
-        List<Mat> imagePoints_tmplm = new ArrayList<Mat>((imagePoints != null) ? imagePoints.size() : 0);
+        List<Mat> imagePoints_tmplm = new ArrayList<>((imagePoints != null) ? imagePoints.size() : 0);
         Mat imagePoints_mat = Converters.vector_vector_Point2f_to_Mat(imagePoints, imagePoints_tmplm);
         Mat retVal = new Mat(initCameraMatrix2D_0(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, imageSize.width, imageSize.height, aspectRatio));
         
@@ -296,9 +296,9 @@ public class Calib3d {
     //javadoc: initCameraMatrix2D(objectPoints, imagePoints, imageSize)
     public static Mat initCameraMatrix2D(List<MatOfPoint3f> objectPoints, List<MatOfPoint2f> imagePoints, Size imageSize)
     {
-        List<Mat> objectPoints_tmplm = new ArrayList<Mat>((objectPoints != null) ? objectPoints.size() : 0);
+        List<Mat> objectPoints_tmplm = new ArrayList<>((objectPoints != null) ? objectPoints.size() : 0);
         Mat objectPoints_mat = Converters.vector_vector_Point3f_to_Mat(objectPoints, objectPoints_tmplm);
-        List<Mat> imagePoints_tmplm = new ArrayList<Mat>((imagePoints != null) ? imagePoints.size() : 0);
+        List<Mat> imagePoints_tmplm = new ArrayList<>((imagePoints != null) ? imagePoints.size() : 0);
         Mat imagePoints_mat = Converters.vector_vector_Point2f_to_Mat(imagePoints, imagePoints_tmplm);
         Mat retVal = new Mat(initCameraMatrix2D_1(objectPoints_mat.nativeObj, imagePoints_mat.nativeObj, imageSize.width, imageSize.height));
         

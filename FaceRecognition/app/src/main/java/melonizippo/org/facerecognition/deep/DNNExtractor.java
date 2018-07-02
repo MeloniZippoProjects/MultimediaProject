@@ -1,19 +1,14 @@
 package melonizippo.org.facerecognition.deep;
 
 
-import android.util.Log;
-
 import static org.opencv.dnn.Dnn.blobFromImage;
-import static org.opencv.imgcodecs.Imgcodecs.imread;
 import static org.opencv.dnn.Dnn.readNetFromCaffe;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.dnn.Net;

@@ -3,11 +3,8 @@
 //
 package org.opencv.features2d;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
-import org.opencv.utils.Converters;
 
 // C++: class BOWImgDescriptorExtractor
 //javadoc: BOWImgDescriptorExtractor

@@ -3,7 +3,6 @@
 //
 package org.opencv.video;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;

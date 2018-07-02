@@ -20,12 +20,12 @@ public abstract class BaseLoaderCallback implements LoaderCallbackInterface {
     {
         switch (status)
         {
-            /** OpenCV initialization was successful. **/
+            /* OpenCV initialization was successful. **/
             case LoaderCallbackInterface.SUCCESS:
             {
-                /** Application must override this method to handle successful library initialization. **/
+                /* Application must override this method to handle successful library initialization. **/
             } break;
-            /** OpenCV loader can not start Google Play Market. **/
+            /* OpenCV loader can not start Google Play Market. **/
             case LoaderCallbackInterface.MARKET_ERROR:
             {
                 Log.e(TAG, "Package installation failed!");
@@ -40,13 +40,13 @@ public abstract class BaseLoaderCallback implements LoaderCallbackInterface {
                 });
                 MarketErrorMessage.show();
             } break;
-            /** Package installation has been canceled. **/
+            /* Package installation has been canceled. **/
             case LoaderCallbackInterface.INSTALL_CANCELED:
             {
                 Log.d(TAG, "OpenCV library installation was canceled by user");
                 finish();
             } break;
-            /** Application is incompatible with this version of OpenCV Manager. Possibly, a service update is required. **/
+            /* Application is incompatible with this version of OpenCV Manager. Possibly, a service update is required. **/
             case LoaderCallbackInterface.INCOMPATIBLE_MANAGER_VERSION:
             {
                 Log.d(TAG, "OpenCV Manager Service is uncompatible with this app!");
@@ -61,7 +61,7 @@ public abstract class BaseLoaderCallback implements LoaderCallbackInterface {
                 });
                 IncomatibilityMessage.show();
             } break;
-            /** Other status, i.e. INIT_FAILED. **/
+            /* Other status, i.e. INIT_FAILED. **/
             default:
             {
                 Log.e(TAG, "OpenCV loading failed!");

@@ -8,17 +8,12 @@ import android.widget.TextView;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
-import org.w3c.dom.Text;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import melonizippo.org.facerecognition.FaceRecognitionApp;
 import melonizippo.org.facerecognition.database.FaceData;
@@ -98,8 +93,6 @@ public class FaceDetectionExecutor {
     {
         Handler mainHandler = new Handler(Looper.getMainLooper());
 
-            mainHandler.post(() -> {
-            textView.setText(String.format("%s\n", newLabel));
-        });
+            mainHandler.post(() -> textView.setText(String.format("%s\n", newLabel)));
     }
 }

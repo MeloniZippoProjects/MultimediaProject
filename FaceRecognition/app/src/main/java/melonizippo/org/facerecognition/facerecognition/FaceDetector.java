@@ -11,9 +11,6 @@ public class FaceDetector {
 
 	private CascadeClassifier face_cascade;
 
-	private static double scaleFactor = Parameters.SCALE_FACTOR;
-	private static int minNeighbors = Parameters.MIN_NEIGHBORS;
-	private static int cannyPruning = Parameters.CANNY_PRUNING;
 	private static Size minSize = Parameters.FACE_MIN_SIZE;
 	private static Size maxSize = Parameters.FACE_MAX_SIZE;
 
@@ -29,6 +26,9 @@ public class FaceDetector {
 	private MatOfRect rectVector = new MatOfRect();
 	public MatOfRect detect(Mat img) {
 		//detect faces
+		double scaleFactor = Parameters.SCALE_FACTOR;
+		int minNeighbors = Parameters.MIN_NEIGHBORS;
+		int cannyPruning = Parameters.CANNY_PRUNING;
 		face_cascade.detectMultiScale(img, rectVector, scaleFactor, minNeighbors, cannyPruning, minSize, maxSize);
 		return rectVector;
 	}

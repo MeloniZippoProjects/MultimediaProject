@@ -84,7 +84,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                 if(mCamera == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
                     boolean connected = false;
                     for (int camIdx = 0; camIdx < Camera.getNumberOfCameras(); ++camIdx) {
-                        Log.d(TAG, "Trying to open camera with new open(" + Integer.valueOf(camIdx) + ")");
+                        Log.d(TAG, "Trying to open camera with new open(" + camIdx + ")");
                         try {
                             mCamera = Camera.open(camIdx);
                             connected = true;
@@ -118,17 +118,25 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
                             }
                         }
                     }
-                    if (localCameraIndex == CAMERA_ID_BACK) {
-                        Log.e(TAG, "Back camera not found!");
-                    } else if (localCameraIndex == CAMERA_ID_FRONT) {
-                        Log.e(TAG, "Front camera not found!");
-                    } else {
-                        Log.d(TAG, "Trying to open camera with new open(" + Integer.valueOf(localCameraIndex) + ")");
-                        try {
-                            mCamera = Camera.open(localCameraIndex);
-                        } catch (RuntimeException e) {
-                            Log.e(TAG, "Camera #" + localCameraIndex + "failed to open: " + e.getLocalizedMessage());
-                        }
+                    switch (localCameraIndex)
+                    {
+                        case CAMERA_ID_BACK:
+                            Log.e(TAG, "Back camera not found!");
+                            break;
+                        case CAMERA_ID_FRONT:
+                            Log.e(TAG, "Front camera not found!");
+                            break;
+                        default:
+                            Log.d(TAG, "Trying to open camera with new open(" + localCameraIndex + ")");
+                            try
+                            {
+                                mCamera = Camera.open(localCameraIndex);
+                            }
+                            catch (RuntimeException e)
+                            {
+                                Log.e(TAG, "Camera #" + localCameraIndex + "failed to open: " + e.getLocalizedMessage());
+                            }
+                            break;
                     }
                 }
             }
@@ -161,7 +169,7 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
 
                     mPreviewFormat = params.getPreviewFormat();
 
-                    Log.d(TAG, "Set preview size to " + Integer.valueOf((int)frameSize.width) + "x" + Integer.valueOf((int)frameSize.height));
+                    Log.d(TAG, "Set preview size to " + (int) frameSize.width + "x" + (int) frameSize.height);
                     params.setPreviewSize((int)frameSize.width, (int)frameSize.height);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH && !android.os.Build.MODEL.equals("GT-I9100"))
@@ -318,12 +326,17 @@ public class JavaCameraView extends CameraBridgeViewBase implements PreviewCallb
 
         @Override
         public Mat rgba() {
-            if (mPreviewFormat == ImageFormat.NV21)
-                Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGBA_NV21, 4);
-            else if (mPreviewFormat == ImageFormat.YV12)
-                Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGB_I420, 4);  // COLOR_YUV2RGBA_YV12 produces inverted colors
-            else
-                throw new IllegalArgumentException("Preview Format can be NV21 or YV12");
+            switch (mPreviewFormat)
+            {
+                case ImageFormat.NV21:
+                    Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGBA_NV21, 4);
+                    break;
+                case ImageFormat.YV12:
+                    Imgproc.cvtColor(mYuvFrameData, mRgba, Imgproc.COLOR_YUV2RGB_I420, 4);  // COLOR_YUV2RGBA_YV12 produces inverted colors
+                    break;
+                default:
+                    throw new IllegalArgumentException("Preview Format can be NV21 or YV12");
+            }
 
             return mRgba;
         }

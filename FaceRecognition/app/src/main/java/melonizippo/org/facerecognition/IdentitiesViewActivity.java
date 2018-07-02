@@ -192,13 +192,14 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
     {
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         TextView textView = findViewById(R.id.TextView);
-        String text = db.knownIdentities.size() + " known identities:\n";
+        StringBuilder text = new StringBuilder(db.knownIdentities.size() + " known identities:\n");
         for(Identity ie : db.knownIdentities)
         {
-            text += "Label: " + ie.label +
-                    ", authorized: " + ie.authorized +
-                    ", photos: " + ie.identityDataset.size() + "\n";
+            text.append("Label: ").append(ie.label)
+                .append(", authorized: ").append(ie.authorized)
+                .append(", photos: ").append(ie.identityDataset.size())
+                .append("\n");
         }
-        textView.setText(text);
+        textView.setText(text.toString());
     }
 }

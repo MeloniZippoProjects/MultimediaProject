@@ -20,5 +20,6 @@
     <string name="clearFormButtonText">Clear</string>
     <string name="AuthorizedText">Authorized</string>
     <string name="NonAuthorizedText">Not authorized</string>
+    <string name="face_sample_description">Face sample</string>
 
 </resources>

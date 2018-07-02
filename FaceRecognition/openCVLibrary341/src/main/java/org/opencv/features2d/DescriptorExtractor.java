@@ -123,7 +123,7 @@ public class DescriptorExtractor {
     public  void compute(List<Mat> images, List<MatOfKeyPoint> keypoints, List<Mat> descriptors)
     {
         Mat images_mat = Converters.vector_Mat_to_Mat(images);
-        List<Mat> keypoints_tmplm = new ArrayList<Mat>((keypoints != null) ? keypoints.size() : 0);
+        List<Mat> keypoints_tmplm = new ArrayList<>((keypoints != null) ? keypoints.size() : 0);
         Mat keypoints_mat = Converters.vector_vector_KeyPoint_to_Mat(keypoints, keypoints_tmplm);
         Mat descriptors_mat = new Mat();
         compute_1(nativeObj, images_mat.nativeObj, keypoints_mat.nativeObj, descriptors_mat.nativeObj);

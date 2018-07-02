@@ -2021,7 +2021,7 @@ public class Imgproc {
     //javadoc: drawContours(image, contours, contourIdx, color, thickness, lineType, hierarchy, maxLevel, offset)
     public static void drawContours(Mat image, List<MatOfPoint> contours, int contourIdx, Scalar color, int thickness, int lineType, Mat hierarchy, int maxLevel, Point offset)
     {
-        List<Mat> contours_tmplm = new ArrayList<Mat>((contours != null) ? contours.size() : 0);
+        List<Mat> contours_tmplm = new ArrayList<>((contours != null) ? contours.size() : 0);
         Mat contours_mat = Converters.vector_vector_Point_to_Mat(contours, contours_tmplm);
         drawContours_0(image.nativeObj, contours_mat.nativeObj, contourIdx, color.val[0], color.val[1], color.val[2], color.val[3], thickness, lineType, hierarchy.nativeObj, maxLevel, offset.x, offset.y);
         
@@ -2031,7 +2031,7 @@ public class Imgproc {
     //javadoc: drawContours(image, contours, contourIdx, color, thickness)
     public static void drawContours(Mat image, List<MatOfPoint> contours, int contourIdx, Scalar color, int thickness)
     {
-        List<Mat> contours_tmplm = new ArrayList<Mat>((contours != null) ? contours.size() : 0);
+        List<Mat> contours_tmplm = new ArrayList<>((contours != null) ? contours.size() : 0);
         Mat contours_mat = Converters.vector_vector_Point_to_Mat(contours, contours_tmplm);
         drawContours_1(image.nativeObj, contours_mat.nativeObj, contourIdx, color.val[0], color.val[1], color.val[2], color.val[3], thickness);
         
@@ -2041,7 +2041,7 @@ public class Imgproc {
     //javadoc: drawContours(image, contours, contourIdx, color)
     public static void drawContours(Mat image, List<MatOfPoint> contours, int contourIdx, Scalar color)
     {
-        List<Mat> contours_tmplm = new ArrayList<Mat>((contours != null) ? contours.size() : 0);
+        List<Mat> contours_tmplm = new ArrayList<>((contours != null) ? contours.size() : 0);
         Mat contours_mat = Converters.vector_vector_Point_to_Mat(contours, contours_tmplm);
         drawContours_2(image.nativeObj, contours_mat.nativeObj, contourIdx, color.val[0], color.val[1], color.val[2], color.val[3]);
         
@@ -2226,7 +2226,7 @@ public class Imgproc {
     //javadoc: fillPoly(img, pts, color, lineType, shift, offset)
     public static void fillPoly(Mat img, List<MatOfPoint> pts, Scalar color, int lineType, int shift, Point offset)
     {
-        List<Mat> pts_tmplm = new ArrayList<Mat>((pts != null) ? pts.size() : 0);
+        List<Mat> pts_tmplm = new ArrayList<>((pts != null) ? pts.size() : 0);
         Mat pts_mat = Converters.vector_vector_Point_to_Mat(pts, pts_tmplm);
         fillPoly_0(img.nativeObj, pts_mat.nativeObj, color.val[0], color.val[1], color.val[2], color.val[3], lineType, shift, offset.x, offset.y);
         
@@ -2236,7 +2236,7 @@ public class Imgproc {
     //javadoc: fillPoly(img, pts, color)
     public static void fillPoly(Mat img, List<MatOfPoint> pts, Scalar color)
     {
-        List<Mat> pts_tmplm = new ArrayList<Mat>((pts != null) ? pts.size() : 0);
+        List<Mat> pts_tmplm = new ArrayList<>((pts != null) ? pts.size() : 0);
         Mat pts_mat = Converters.vector_vector_Point_to_Mat(pts, pts_tmplm);
         fillPoly_1(img.nativeObj, pts_mat.nativeObj, color.val[0], color.val[1], color.val[2], color.val[3]);
         
@@ -2680,7 +2680,7 @@ public class Imgproc {
     //javadoc: polylines(img, pts, isClosed, color, thickness, lineType, shift)
     public static void polylines(Mat img, List<MatOfPoint> pts, boolean isClosed, Scalar color, int thickness, int lineType, int shift)
     {
-        List<Mat> pts_tmplm = new ArrayList<Mat>((pts != null) ? pts.size() : 0);
+        List<Mat> pts_tmplm = new ArrayList<>((pts != null) ? pts.size() : 0);
         Mat pts_mat = Converters.vector_vector_Point_to_Mat(pts, pts_tmplm);
         polylines_0(img.nativeObj, pts_mat.nativeObj, isClosed, color.val[0], color.val[1], color.val[2], color.val[3], thickness, lineType, shift);
         
@@ -2690,7 +2690,7 @@ public class Imgproc {
     //javadoc: polylines(img, pts, isClosed, color, thickness)
     public static void polylines(Mat img, List<MatOfPoint> pts, boolean isClosed, Scalar color, int thickness)
     {
-        List<Mat> pts_tmplm = new ArrayList<Mat>((pts != null) ? pts.size() : 0);
+        List<Mat> pts_tmplm = new ArrayList<>((pts != null) ? pts.size() : 0);
         Mat pts_mat = Converters.vector_vector_Point_to_Mat(pts, pts_tmplm);
         polylines_1(img.nativeObj, pts_mat.nativeObj, isClosed, color.val[0], color.val[1], color.val[2], color.val[3], thickness);
         
@@ -2700,7 +2700,7 @@ public class Imgproc {
     //javadoc: polylines(img, pts, isClosed, color)
     public static void polylines(Mat img, List<MatOfPoint> pts, boolean isClosed, Scalar color)
     {
-        List<Mat> pts_tmplm = new ArrayList<Mat>((pts != null) ? pts.size() : 0);
+        List<Mat> pts_tmplm = new ArrayList<>((pts != null) ? pts.size() : 0);
         Mat pts_mat = Converters.vector_vector_Point_to_Mat(pts, pts_tmplm);
         polylines_2(img.nativeObj, pts_mat.nativeObj, isClosed, color.val[0], color.val[1], color.val[2], color.val[3]);
         

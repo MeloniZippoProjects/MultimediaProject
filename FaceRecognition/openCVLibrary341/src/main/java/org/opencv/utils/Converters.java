@@ -517,8 +517,7 @@ public class Converters {
         Mat res;
         int lCount = (pts != null) ? pts.size() : 0;
         if (lCount > 0) {
-            for (MatOfPoint vpt : pts)
-                mats.add(vpt);
+            mats.addAll(pts);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -533,7 +532,7 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         for (Mat mi : mats) {
             MatOfPoint pt = new MatOfPoint(mi);
@@ -551,7 +550,7 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         for (Mat mi : mats) {
             MatOfPoint2f pt = new MatOfPoint2f(mi);
@@ -566,8 +565,7 @@ public class Converters {
         Mat res;
         int lCount = (pts != null) ? pts.size() : 0;
         if (lCount > 0) {
-            for (MatOfPoint2f vpt : pts)
-                mats.add(vpt);
+            mats.addAll(pts);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -583,7 +581,7 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         for (Mat mi : mats) {
             MatOfPoint3f pt = new MatOfPoint3f(mi);
@@ -598,8 +596,7 @@ public class Converters {
         Mat res;
         int lCount = (pts != null) ? pts.size() : 0;
         if (lCount > 0) {
-            for (MatOfPoint3f vpt : pts)
-                mats.add(vpt);
+            mats.addAll(pts);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -612,8 +609,7 @@ public class Converters {
         Mat res;
         int lCount = (kps != null) ? kps.size() : 0;
         if (lCount > 0) {
-            for (MatOfKeyPoint vkp : kps)
-                mats.add(vkp);
+            mats.addAll(kps);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -628,7 +624,7 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         for (Mat mi : mats) {
             MatOfKeyPoint vkp = new MatOfKeyPoint(mi);
@@ -712,8 +708,7 @@ public class Converters {
         Mat res;
         int lCount = (lvdm != null) ? lvdm.size() : 0;
         if (lCount > 0) {
-            for (MatOfDMatch vdm : lvdm)
-                mats.add(vdm);
+            mats.addAll(lvdm);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -728,7 +723,7 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         lvdm.clear();
         for (Mat mi : mats) {
@@ -744,8 +739,7 @@ public class Converters {
         Mat res;
         int lCount = (lvb != null) ? lvb.size() : 0;
         if (lCount > 0) {
-            for (MatOfByte vb : lvb)
-                mats.add(vb);
+            mats.addAll(lvb);
             res = vector_Mat_to_Mat(mats);
         } else {
             res = new Mat();
@@ -760,10 +754,10 @@ public class Converters {
         if (m == null)
             throw new java.lang.IllegalArgumentException("Input Mat can't be null");
 
-        List<Mat> mats = new ArrayList<Mat>(m.rows());
+        List<Mat> mats = new ArrayList<>(m.rows());
         Mat_to_vector_Mat(m, mats);
         for (Mat mi : mats) {
-            List<Byte> lb = new ArrayList<Byte>();
+            List<Byte> lb = new ArrayList<>();
             Mat_to_vector_char(mi, lb);
             llb.add(lb);
             mi.release();

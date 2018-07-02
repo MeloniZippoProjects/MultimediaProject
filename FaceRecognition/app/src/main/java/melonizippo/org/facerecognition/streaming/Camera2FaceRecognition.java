@@ -117,9 +117,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         });
 
         FloatingActionButton switchCamera = findViewById(R.id.switchCamera);
-        switchCamera.setOnClickListener(view -> {
-            toggleJavaCameraView();
-        });
+        switchCamera.setOnClickListener(view -> toggleJavaCameraView());
     }
 
     private void toggleJavaCameraView() {

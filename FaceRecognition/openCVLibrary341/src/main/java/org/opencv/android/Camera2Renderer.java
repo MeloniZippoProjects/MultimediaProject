@@ -1,6 +1,7 @@
 package org.opencv.android;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import android.annotation.TargetApi;
@@ -214,7 +215,7 @@ public class Camera2Renderer extends CameraGLRendererBase {
                     .createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(surface);
 
-            mCameraDevice.createCaptureSession(Arrays.asList(surface),
+            mCameraDevice.createCaptureSession(Collections.singletonList(surface),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured( CameraCaptureSession cameraCaptureSession) {

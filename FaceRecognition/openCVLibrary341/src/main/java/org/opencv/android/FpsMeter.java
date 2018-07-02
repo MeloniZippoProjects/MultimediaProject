@@ -45,7 +45,7 @@ public class FpsMeter {
                 double fps = STEP * mFrequency / (time - mprevFrameTime);
                 mprevFrameTime = time;
                 if (mWidth != 0 && mHeight != 0)
-                    mStrfps = FPS_FORMAT.format(fps) + " FPS@" + Integer.valueOf(mWidth) + "x" + Integer.valueOf(mHeight);
+                    mStrfps = FPS_FORMAT.format(fps) + " FPS@" + mWidth + "x" + mHeight;
                 else
                     mStrfps = FPS_FORMAT.format(fps) + " FPS";
                 Log.i(TAG, mStrfps);

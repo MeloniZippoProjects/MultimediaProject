@@ -5,6 +5,7 @@
 
     <ImageView
         android:id="@+id/facePreview"
+        android:contentDescription="@string/face_sample_description"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:scaleType="centerInside"

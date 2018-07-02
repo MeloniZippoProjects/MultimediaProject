@@ -1,7 +1,5 @@
 package melonizippo.org.facerecognition.database;
 
-import android.media.FaceDetector;
-
 public class LabeledFaceData extends FaceData {
 
     private Identity label;

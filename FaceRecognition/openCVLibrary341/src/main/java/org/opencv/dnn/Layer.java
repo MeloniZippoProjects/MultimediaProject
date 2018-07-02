@@ -28,7 +28,7 @@ public class Layer extends Algorithm {
     public  List<Mat> finalize(List<Mat> inputs)
     {
         Mat inputs_mat = Converters.vector_Mat_to_Mat(inputs);
-        List<Mat> retVal = new ArrayList<Mat>();
+        List<Mat> retVal = new ArrayList<>();
         Mat retValMat = new Mat(finalize_0(nativeObj, inputs_mat.nativeObj));
         Converters.Mat_to_vector_Mat(retValMat, retVal);
         return retVal;
@@ -77,7 +77,7 @@ public class Layer extends Algorithm {
     //javadoc: Layer::get_blobs()
     public  List<Mat> get_blobs()
     {
-        List<Mat> retVal = new ArrayList<Mat>();
+        List<Mat> retVal = new ArrayList<>();
         Mat retValMat = new Mat(get_blobs_0(nativeObj));
         Converters.Mat_to_vector_Mat(retValMat, retVal);
         return retVal;

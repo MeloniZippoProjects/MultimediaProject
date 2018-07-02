@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name = "CameraBridgeViewBase" >
+    <declare-styleable name = "CameraGLSurfaceView" >
        <attr name="show_fps" format="boolean"/>
        <attr name="camera_id" format="integer" >
           <enum name="any" value="-1" />

@@ -83,17 +83,25 @@ public class CameraRenderer extends CameraGLRendererBase {
                         }
                     }
                 }
-                if (localCameraIndex == CameraBridgeViewBase.CAMERA_ID_BACK) {
-                    Log.e(LOGTAG, "Back camera not found!");
-                } else if (localCameraIndex == CameraBridgeViewBase.CAMERA_ID_FRONT) {
-                    Log.e(LOGTAG, "Front camera not found!");
-                } else {
-                    Log.d(LOGTAG, "Trying to open camera with new open(" + localCameraIndex + ")");
-                    try {
-                        mCamera = Camera.open(localCameraIndex);
-                    } catch (RuntimeException e) {
-                        Log.e(LOGTAG, "Camera #" + localCameraIndex + "failed to open: " + e.getLocalizedMessage());
-                    }
+                switch (localCameraIndex)
+                {
+                    case CameraBridgeViewBase.CAMERA_ID_BACK:
+                        Log.e(LOGTAG, "Back camera not found!");
+                        break;
+                    case CameraBridgeViewBase.CAMERA_ID_FRONT:
+                        Log.e(LOGTAG, "Front camera not found!");
+                        break;
+                    default:
+                        Log.d(LOGTAG, "Trying to open camera with new open(" + localCameraIndex + ")");
+                        try
+                        {
+                            mCamera = Camera.open(localCameraIndex);
+                        }
+                        catch (RuntimeException e)
+                        {
+                            Log.e(LOGTAG, "Camera #" + localCameraIndex + "failed to open: " + e.getLocalizedMessage());
+                        }
+                        break;
                 }
             }
         }

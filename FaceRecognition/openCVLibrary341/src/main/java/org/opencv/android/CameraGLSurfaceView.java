@@ -45,8 +45,8 @@ public class CameraGLSurfaceView extends GLSurfaceView {
     public CameraGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray styledAttrs = getContext().obtainStyledAttributes(attrs, R.styleable.CameraBridgeViewBase);
-        int cameraIndex = styledAttrs.getInt(R.styleable.CameraBridgeViewBase_camera_id, -1);
+        TypedArray styledAttrs = getContext().obtainStyledAttributes(attrs, R.styleable.CameraGLSurfaceView);
+        int cameraIndex = styledAttrs.getInt(R.styleable.CameraGLSurfaceView_camera_id, -1);
         styledAttrs.recycle();
 
         if(android.os.Build.VERSION.SDK_INT >= 21)
