@@ -13,16 +13,14 @@ public class KNNClassifier {
 
 	private FaceDatabase faceDatabase;
 
-	private static final PredictedClass unknownPerson = new PredictedClass(null, 1d);
-
 	public KNNClassifier()
 	{
 		faceDatabase = FaceDatabaseStorage.getFaceDatabase();
 	}
 
 	//TODO
-	public PredictedClass predict(FaceData query) {
-		//perform a kNN similarity search and call getBestLabel to retrieve the best label
+	public PredictedClass predict(FaceData queryFaceData) {
+		//perform a kNN similarity search and call getBestClass to retrieve the best label
 
 		TreeMap<Double, LabeledFaceData> sortedFaceData = new TreeMap<>();
 
@@ -31,8 +29,8 @@ public class KNNClassifier {
 		{
 			for(FaceData faceData : identity.identityDataset)
 			{
-				LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, identity);
-				double similarity = labeledFaceData.getSimilarity(query);
+			    LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, identity);
+				double similarity = labeledFaceData.getSimilarity(queryFaceData);
 				sortedFaceData.put(similarity, labeledFaceData);
 			}
 		}
@@ -41,7 +39,7 @@ public class KNNClassifier {
 		for(FaceData faceData : faceDatabase.uncategorizedData)
 		{
 			LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, null);
-			double similarity = labeledFaceData.getSimilarity(query);
+			double similarity = labeledFaceData.getSimilarity(queryFaceData);
 			sortedFaceData.put(similarity, labeledFaceData);
 		}
 
@@ -56,57 +54,50 @@ public class KNNClassifier {
 				break;
 		}
 
-		if(nearestNeighbours.size() != k)
-		{
-			return unknownPerson;
-		}
-		else {
-			PredictedClass predictedClass = getBestLabel(nearestNeighbours);
-			if(predictedClass == null)
-				return unknownPerson;
+        PredictedClass predictedClass = getBestClass(nearestNeighbours);
 
-			double minConfidence = Parameters.MIN_CONFIDENCE;
-			if(predictedClass.getConfidence() >= minConfidence)
-			{
-				return predictedClass;
-			}
-			else
-			{
-				return unknownPerson;
-			}
-		}
+        double minConfidence = Parameters.MIN_CONFIDENCE;
+        if(predictedClass.getConfidence() >= minConfidence)
+        {
+            return predictedClass;
+        }
+        else
+        {
+            return new PredictedClass(null, predictedClass.getConfidence());
+        }
 	}
 
 
 	//todo: refactor "label" names to "identity" ones
-	private PredictedClass getBestLabel(List<Map.Entry<Double,LabeledFaceData>> results) {
+	private PredictedClass getBestClass(List<Map.Entry<Double,LabeledFaceData>> results)
+    {
 		//Loop in the results list and retrieve the best label
 
-		HashMap<Identity, Double> labelScores = new HashMap<>();
-		HashMap<Identity, Double> bestLabelsScore = new HashMap<>();
+		HashMap<Identity, Double> identityScores = new HashMap<>();
+		HashMap<Identity, Double> bestIdentityScore = new HashMap<>();
 
 		for(Map.Entry<Double,LabeledFaceData> descriptor : results)
 		{
-			Identity label = descriptor.getValue().getLabel();
-			Double currentLabelScore = labelScores.getOrDefault(label, 0d);
-			labelScores.put(label, currentLabelScore + descriptor.getKey());
+			Identity identityLabel = descriptor.getValue().getIdentityLabel();
+			Double currentIdentityScore = identityScores.getOrDefault(identityLabel, 0d);
+			identityScores.put(identityLabel, currentIdentityScore + descriptor.getKey());
 
-			Double currentBestLabelScore = bestLabelsScore.getOrDefault(label, 0d);
-			if(descriptor.getKey() > currentBestLabelScore)
-				bestLabelsScore.put(label, descriptor.getKey());
+			Double currentBestIdentityScore = bestIdentityScore.getOrDefault(identityLabel, 0d);
+			if(descriptor.getKey() > currentBestIdentityScore)
+				bestIdentityScore.put(identityLabel, descriptor.getKey());
 		}
 
-		Optional<Map.Entry<Identity,Double>> bestLabelOptional = labelScores.entrySet().stream().
-				max(Comparator.comparing(Map.Entry::getValue));
+		Optional<Map.Entry<Identity,Double>> bestIdentityLabel =
+                identityScores.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue));
 
-		if(bestLabelOptional.isPresent())
+		if(bestIdentityLabel.isPresent())
 		{
-			Identity bestLabel = bestLabelOptional.get().getKey();
-			Double confidence = bestLabelsScore.get(bestLabel);
+			Identity bestLabel = bestIdentityLabel.get().getKey();
+			Double confidence = bestIdentityScore.get(bestLabel);
 
 			return new PredictedClass(bestLabel, confidence);
 		}
-
-		return null;
+		else
+		    throw new IllegalStateException("Best label should exist");
 	}
 }

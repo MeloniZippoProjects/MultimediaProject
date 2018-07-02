@@ -17,7 +17,9 @@ import java.util.concurrent.Semaphore;
 
 import melonizippo.org.facerecognition.FaceRecognitionApp;
 import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
+import melonizippo.org.facerecognition.deep.Parameters;
 
 public class FaceDetectionExecutor {
 
@@ -26,15 +28,15 @@ public class FaceDetectionExecutor {
     private DNNExtractor extractor;
     private KNNClassifier knnClassifier;
 
-    private TextView textView;
+    private TextView classificationTextView;
 
     private Semaphore classifying;
 
-    public FaceDetectionExecutor(FaceRecognitionApp app, TextView textView)
+    public FaceDetectionExecutor(FaceRecognitionApp app, TextView classificationTextView)
     {
         extractor = app.extractor;
         knnClassifier = app.knnClassifier;
-        this.textView = textView;
+        this.classificationTextView = classificationTextView;
         classifying = new Semaphore(1);
     }
 
@@ -48,32 +50,37 @@ public class FaceDetectionExecutor {
             try {
                 if(faces.toList().size() == 0)
                 {
-                    updateLabel("No face detected");
+                    updateClassificationText("No face detected");
                     return;
                 }
 
-                //todo: we do not need LabeledRects
-                List<LabeledRect> labeledRects = new LinkedList<>();
+                //todo: check bad db states
+                if(FaceDatabaseStorage.getFaceDatabase().getSampleCount() < Parameters.K)
+                {
+                    updateClassificationText("Not enough samples in database for classification");
+                    return;
+                }
 
-                for (Rect face : faces.toArray()) {
+                List<PredictedClass> predictedClasses = new LinkedList<>();
+                for (Rect face : faces.toArray())
+                {
                     faceMat = frameMat.submat(face);
                     float[] faceFeatures = extractor.extract(faceMat);
                     FaceData query = new FaceData(faceMat, faceFeatures);
+
                     PredictedClass predict = knnClassifier.predict(query);
                     //todo: if intruder, send alarm and store it
 
-                    LabeledRect labeledRect = new LabeledRect(face, predict.getLabel() + "(" + predict.getConfidence() + ")", predict.getConfidence());
-                    //LabeledRect labeledRect = new LabeledRect(face, "enrico" + "(" + 1 + ")", 1d);
-                    labeledRects.add(labeledRect);
+                    predictedClasses.add(predict);
                 }
 
                 StringBuilder stringBuilder = new StringBuilder("");
-                for (LabeledRect labeledRect : labeledRects) {
-                    stringBuilder.append(labeledRect.getLabel()).append("\n");
+                for (PredictedClass predictedClass: predictedClasses) {
+                    //todo: get pretty print from class
+                    stringBuilder.append(predictedClass.getLabel()).append("\n");
                 }
 
-                updateLabel(stringBuilder.toString());
-
+                updateClassificationText(stringBuilder.toString());
             }
             catch(Exception ex)
             {
@@ -89,10 +96,10 @@ public class FaceDetectionExecutor {
         return true;
     }
 
-    private void updateLabel(String newLabel)
+    private void updateClassificationText(String newLabel)
     {
         Handler mainHandler = new Handler(Looper.getMainLooper());
 
-            mainHandler.post(() -> textView.setText(String.format("%s\n", newLabel)));
+            mainHandler.post(() -> classificationTextView.setText(String.format("%s\n", newLabel)));
     }
 }

@@ -71,7 +71,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     private ImageReader imageReader;
     private CameraCaptureSession cameraCaptureSession;
 
-    private TextView textView;
+    private TextView classificationTextView;
 
     private FaceDetectionExecutor executorService;
 
@@ -101,9 +101,9 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(surfaceHolderCallback);
 
-        textView = findViewById(R.id.faceLabel);
+        classificationTextView = findViewById(R.id.classificationTextView);
 
-        executorService = new FaceDetectionExecutor(app, textView);
+        executorService = new FaceDetectionExecutor(app, classificationTextView);
 
         //graphic settings
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

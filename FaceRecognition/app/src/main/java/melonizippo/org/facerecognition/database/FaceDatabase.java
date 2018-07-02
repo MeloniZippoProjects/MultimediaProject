@@ -17,4 +17,14 @@ public class FaceDatabase implements Serializable
     {
         return new ArrayList<>();
     }
+
+    public int getSampleCount()
+    {
+        int sum = 0;
+        for (Identity identity : knownIdentities)
+        {
+            sum += identity.identityDataset.size();
+        }
+        return sum;
+    }
 }
