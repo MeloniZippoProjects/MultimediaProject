@@ -1,10 +1,12 @@
 package melonizippo.org.facerecognition.database;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Identity implements Serializable
+public class Identity implements Serializable, Comparable<Identity>
 {
     public String label;
     public boolean authorized;
@@ -33,5 +35,11 @@ public class Identity implements Serializable
         if (!(other instanceof Identity))return false;
         Identity otherIdentity = (Identity) other;
         return otherIdentity.label.matches(this.label);
+    }
+
+    @Override
+    public int compareTo(@NonNull Identity o)
+    {
+        return this.label.compareTo(o.label);
     }
 }

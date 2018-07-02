@@ -66,4 +66,9 @@ public class PredictedClass implements Comparable<PredictedClass>
 				": confidence " + confidenceFormatter.format(confidence) +
 				" ; " + (getAuthorized() ? "Authorized" : "Not authorized");
 	}
+
+    public void setFaceData(FaceData faceData)
+    {
+        this.faceData = faceData;
+    }
 }

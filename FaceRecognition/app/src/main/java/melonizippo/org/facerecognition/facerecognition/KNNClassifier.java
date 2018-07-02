@@ -55,6 +55,7 @@ public class KNNClassifier {
 		}
 
         PredictedClass predictedClass = getBestClass(nearestNeighbours);
+		predictedClass.setFaceData(queryFaceData);
 
         double minConfidence = Parameters.MIN_CONFIDENCE;
         if(predictedClass.getConfidence() >= minConfidence)
@@ -63,7 +64,7 @@ public class KNNClassifier {
         }
         else
         {
-            return new PredictedClass(null, predictedClass.getConfidence());
+            return new PredictedClass(null, predictedClass.getConfidence(), queryFaceData);
         }
 	}
 
@@ -95,7 +96,7 @@ public class KNNClassifier {
 			Identity bestLabel = bestIdentityLabel.get().getKey();
 			Double confidence = bestIdentityScore.get(bestLabel);
 
-			return new PredictedClass(bestLabel, confidence);
+			return new PredictedClass(bestLabel, confidence, null);
 		}
 		else
 		    throw new IllegalStateException("Best label should exist");

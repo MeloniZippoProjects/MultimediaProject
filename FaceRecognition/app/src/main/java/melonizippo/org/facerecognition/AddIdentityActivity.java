@@ -55,8 +55,10 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final int PICK_VIDEO = 3;
     private static final int SHOOT_IMAGE = 4;
     private static final int SHOOT_VIDEO = 5;
+    private static final int PICK_IMAGE_MULTIPLE_UNCATEGORIZED = 6;
 
     private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
+
 
 
     private boolean isDefaultLabel = true;
@@ -271,6 +273,7 @@ public class AddIdentityActivity extends AppCompatActivity
                 "Select video from gallery",
                 "Capture photo from camera",
                 "Capture video from camera",
+                "Select from uncategorized"
         };
         pictureDialog.setItems(pictureDialogItems,
                 (dialog, which) ->
@@ -287,6 +290,9 @@ public class AddIdentityActivity extends AppCompatActivity
                             break;
                         case 3:
                             takeVideoFromCamera();
+                            break;
+                        case 4:
+                            choosePhotosFromUncategorized();
                             break;
                     }
                 });
@@ -362,6 +368,57 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
+    private void choosePhotosFromUncategorized()
+    {
+        saveUncategorizedToStorage();
+        Uri uri = Uri.parse(Environment.getExternalStorageDirectory() + "/uncategorizedFaces/");
+        Intent intent = new Intent();
+        intent.setDataAndType(uri, "image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+
+        startActivityForResult(Intent.createChooser(intent, "Select photos"), PICK_IMAGE_MULTIPLE_UNCATEGORIZED);
+    }
+
+    private void saveUncategorizedToStorage()
+    {
+        FaceDatabase database = FaceDatabaseStorage.getFaceDatabase();
+        File cacheDir = Environment.getExternalStorageDirectory();
+        File uncategorizedDir = new File(cacheDir, "uncategorizedFaces");
+        if(!uncategorizedDir.mkdirs())
+            throw new IllegalStateException("Can't create dir");
+
+        int id = 0;
+        for (FaceData data: database.uncategorizedData)
+        {
+            Bitmap bitmap = data.toBitmap();
+            FileOutputStream fos = null;
+            try
+            {
+                File outFile = new File(uncategorizedDir, ""+id+".jpg");
+                fos = new FileOutputStream(outFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                id++;
+            }
+            catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+            finally
+            {
+                try
+                {
+                    if (fos != null)
+                        fos.close();
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Can't even close");
+                }
+            }
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -381,6 +438,11 @@ public class AddIdentityActivity extends AppCompatActivity
             else if (requestCode == PICK_IMAGE_MULTIPLE && data != null)
             {
                 processImages(data);
+            }
+            else if (requestCode == PICK_IMAGE_MULTIPLE_UNCATEGORIZED && data != null)
+            {
+                processImages(data);
+                //todo: cleanup phase
             }
             else if ( (requestCode == SHOOT_VIDEO || requestCode == PICK_VIDEO) && data != null)
             {

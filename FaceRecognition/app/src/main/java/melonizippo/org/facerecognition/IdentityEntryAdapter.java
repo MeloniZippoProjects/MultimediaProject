@@ -46,6 +46,7 @@ public class IdentityEntryAdapter extends ArrayAdapter<Identity>
         }
 
         LinearLayout faceSamples = convertView.findViewById(R.id.faceSamples);
+        faceSamples.removeAllViews();
         FaceDataAdapter fdAdapter = new FaceDataAdapter(ie.identityDataset, getContext());
         for (int i = 0; i < fdAdapter.getCount(); i++)
         {

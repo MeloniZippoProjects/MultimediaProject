@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
@@ -59,7 +61,9 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
 
         //Setup list view
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
-        identityEntryAdapter = new IdentityEntryAdapter(db.knownIdentities, getApplicationContext());
+        List<Identity> identitiesList = new ArrayList<>();
+        identitiesList.addAll(db.knownIdentities);
+        identityEntryAdapter = new IdentityEntryAdapter(identitiesList, getApplicationContext());
         ListView identitiesView = findViewById(R.id.identitiesView);
         identitiesView.setAdapter(identityEntryAdapter);
 
