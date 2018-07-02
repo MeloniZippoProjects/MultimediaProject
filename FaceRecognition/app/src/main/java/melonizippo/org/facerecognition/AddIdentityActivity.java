@@ -389,7 +389,7 @@ public class AddIdentityActivity extends AppCompatActivity
             throw new IllegalStateException("Can't create dir");
 
         int id = 0;
-        for (FaceData data: database.uncategorizedData)
+        for (FaceData data: database.uncategorizedData.values())
         {
             Bitmap bitmap = data.toBitmap();
             FileOutputStream fos = null;

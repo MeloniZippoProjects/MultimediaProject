@@ -17,6 +17,7 @@ import java.util.concurrent.Semaphore;
 
 import melonizippo.org.facerecognition.FaceRecognitionApp;
 import melonizippo.org.facerecognition.database.FaceData;
+import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
@@ -109,8 +110,8 @@ public class FaceDetectionExecutor {
 
             if (!predictedClass.isClassified())
             {
-                FaceDatabaseStorage.getFaceDatabase().uncategorizedData
-                        .add(predictedClass.getFaceData());
+                FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
+                db.uncategorizedData.put(db.nextMapId.incrementAndGet(), predictedClass.getFaceData());
                 databaseChanged = true;
             }
         }
