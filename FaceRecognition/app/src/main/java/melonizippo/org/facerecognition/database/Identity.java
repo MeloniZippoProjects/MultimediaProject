@@ -24,4 +24,14 @@ public class Identity implements Serializable
             identityDataset.removeAll(toRemove);
         }
     }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == null) return false;
+        if(other == this) return true;
+        if (!(other instanceof Identity))return false;
+        Identity otherIdentity = (Identity) other;
+        return otherIdentity.label.matches(this.label);
+    }
 }

@@ -24,7 +24,8 @@ public class FaceDetector {
 
 	//TODO
 	private MatOfRect rectVector = new MatOfRect();
-	public MatOfRect detect(Mat img) {
+	public MatOfRect detect(Mat img)
+	{
 		//detect faces
 		double scaleFactor = Parameters.SCALE_FACTOR;
 		int minNeighbors = Parameters.MIN_NEIGHBORS;

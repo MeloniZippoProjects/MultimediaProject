@@ -23,7 +23,8 @@ import melonizippo.org.facerecognition.deep.Parameters;
 
 public class FaceDetectionExecutor {
 
-    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private ExecutorService classificationService = Executors.newSingleThreadExecutor();
+    private ExecutorService logAndStoreService = Executors.newSingleThreadExecutor();
 
     private DNNExtractor extractor;
     private KNNClassifier knnClassifier;
@@ -69,15 +70,17 @@ public class FaceDetectionExecutor {
                     FaceData query = new FaceData(faceMat, faceFeatures);
 
                     PredictedClass predict = knnClassifier.predict(query);
-                    //todo: if intruder, send alarm and store it
 
                     predictedClasses.add(predict);
                 }
 
+                logAndStoreService.submit(
+                        () -> logAndStore(predictedClasses));
+
                 StringBuilder stringBuilder = new StringBuilder("");
-                for (PredictedClass predictedClass: predictedClasses) {
-                    //todo: get pretty print from class
-                    stringBuilder.append(predictedClass.getLabel()).append("\n");
+                for (PredictedClass predictedClass: predictedClasses)
+                {
+                    stringBuilder.append(predictedClass.toString()).append("\n");
                 }
 
                 updateClassificationText(stringBuilder.toString());
@@ -86,14 +89,34 @@ public class FaceDetectionExecutor {
             {
                 Log.d("executor", "task crashed");
             }
-            finally {
+            finally
+            {
                 classifying.release();
             }
         };
 
-        executorService.submit(task);
+        classificationService.submit(task);
 
         return true;
+    }
+
+    private void logAndStore(List<PredictedClass> predictedClasses)
+    {
+        boolean databaseChanged = false;
+        for (PredictedClass predictedClass: predictedClasses)
+        {
+            //todo: add log entry?
+
+            if (!predictedClass.isClassified())
+            {
+                FaceDatabaseStorage.getFaceDatabase().uncategorizedData
+                        .add(predictedClass.getFaceData());
+                databaseChanged = true;
+            }
+        }
+
+        if(databaseChanged)
+            FaceDatabaseStorage.storeToInternalStorage();
     }
 
     private void updateClassificationText(String newLabel)

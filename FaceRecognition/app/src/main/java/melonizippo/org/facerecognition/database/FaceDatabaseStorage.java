@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 import melonizippo.org.facerecognition.FaceRecognitionApp;
 
@@ -60,8 +62,13 @@ public class FaceDatabaseStorage
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         )
         {
+            FileChannel fileChannel = fos.getChannel();
+            FileLock fileLock = fileChannel.lock();
+
             oos.writeObject(faceDatabase);
             Log.d(TAG, "Database stored");
+
+            fileLock.release();
         }
         catch (Exception ex)
         {

@@ -3,20 +3,13 @@ package melonizippo.org.facerecognition.database;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class FaceDatabase implements Serializable
 {
-    public List<Identity> knownIdentities = new ArrayList<>();
-    public List<FaceData> uncategorizedData = new ArrayList<>();
-
-    //todo: still discussed about
-    //public List<Identity> SuggestedIdentities;
-
-    //todo: implement this
-    public List<Identity> buildSuggestedIdentities()
-    {
-        return new ArrayList<>();
-    }
+    public Set<Identity> knownIdentities = new ConcurrentSkipListSet<>();
+    public Set<FaceData> uncategorizedData = new ConcurrentSkipListSet<>();
 
     public int getSampleCount()
     {
