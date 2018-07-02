@@ -45,6 +45,7 @@ import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
+import melonizippo.org.facerecognition.streaming.Camera2FaceRecognition;
 
 public class AddIdentityActivity extends AppCompatActivity
 {
@@ -370,53 +371,8 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void choosePhotosFromUncategorized()
     {
-        saveUncategorizedToStorage();
-        Uri uri = Uri.parse(Environment.getExternalStorageDirectory() + "/uncategorizedFaces/");
-        Intent intent = new Intent();
-        intent.setDataAndType(uri, "image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-
-        startActivityForResult(Intent.createChooser(intent, "Select photos"), PICK_IMAGE_MULTIPLE_UNCATEGORIZED);
-    }
-
-    private void saveUncategorizedToStorage()
-    {
-        FaceDatabase database = FaceDatabaseStorage.getFaceDatabase();
-        File cacheDir = Environment.getExternalStorageDirectory();
-        File uncategorizedDir = new File(cacheDir, "uncategorizedFaces");
-        if(!uncategorizedDir.mkdirs())
-            throw new IllegalStateException("Can't create dir");
-
-        int id = 0;
-        for (FaceData data: database.uncategorizedData.values())
-        {
-            Bitmap bitmap = data.toBitmap();
-            FileOutputStream fos = null;
-            try
-            {
-                File outFile = new File(uncategorizedDir, ""+id+".jpg");
-                fos = new FileOutputStream(outFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                id++;
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
-            finally
-            {
-                try
-                {
-                    if (fos != null)
-                        fos.close();
-                }
-                catch (Exception e)
-                {
-                    System.out.println("Can't even close");
-                }
-            }
-        }
+        Intent intent = new Intent(AddIdentityActivity.this, AddUnknownIdentityActivity.class);
+        startActivity(intent);
     }
 
     @Override
