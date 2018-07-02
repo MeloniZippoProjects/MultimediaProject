@@ -11,6 +11,10 @@
         android:layout_height="0dp"
         android:layout_weight="1"
 
-        android:numColumns="3"
-    />
+        android:horizontalSpacing="5dp"
+        android:verticalSpacing="5dp"
+        android:gravity="center"
+
+        android:numColumns="auto_fit"
+        />
 </android.support.constraint.ConstraintLayout>
