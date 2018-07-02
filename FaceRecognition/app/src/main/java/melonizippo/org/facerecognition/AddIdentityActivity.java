@@ -41,7 +41,7 @@ import java.util.List;
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
-import melonizippo.org.facerecognition.database.IdentityEntry;
+import melonizippo.org.facerecognition.database.Identity;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
@@ -192,16 +192,16 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void commitAddIdentity()
     {
-        IdentityEntry identityEntry = new IdentityEntry();
-        identityEntry.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
-        identityEntry.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
-        identityEntry.identityDataset = new ArrayList<>(faceDataset);
+        Identity identity = new Identity();
+        identity.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
+        identity.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
+        identity.identityDataset = new ArrayList<>(faceDataset);
 
-        if(!validateIdentity(identityEntry))
+        if(!validateIdentity(identity))
             return;
         else
         {
-            FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identityEntry);
+            FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identity);
             FaceDatabaseStorage.storeToInternalStorage();
 
             showSnackBar(R.string.info_add_success);
@@ -209,9 +209,9 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
-    private boolean validateIdentity(IdentityEntry identityEntry)
+    private boolean validateIdentity(Identity identity)
     {
-        if(identityEntry.label.matches(""))
+        if(identity.label.matches(""))
         {
             showSnackBar(R.string.error_no_name);
             return false;
@@ -220,16 +220,16 @@ public class AddIdentityActivity extends AppCompatActivity
         FaceDatabase fd = FaceDatabaseStorage.getFaceDatabase();
         if(
                 fd.knownIdentities.stream().anyMatch(
-                        (dbIdentity) -> dbIdentity.label.matches(identityEntry.label))
+                        (dbIdentity) -> dbIdentity.label.matches(identity.label))
                 )
         {
             showSnackBar(R.string.error_name_duplicate);
             return false;
         }
 
-        identityEntry.filterDuplicatesFromDataset();
+        identity.filterDuplicatesFromDataset();
 
-        int datasetCount = identityEntry.identityDataset.size();
+        int datasetCount = identity.identityDataset.size();
         if(datasetCount < Parameters.MIN_IDENTITY_SAMPLES)
         {
             Resources res = getResources();

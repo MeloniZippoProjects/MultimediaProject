@@ -6,19 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
-import melonizippo.org.facerecognition.database.IdentityEntry;
+import melonizippo.org.facerecognition.database.Identity;
 
-public class IdentityEntryAdapter extends ArrayAdapter<IdentityEntry>
+public class IdentityEntryAdapter extends ArrayAdapter<Identity>
 {
     Context mContext;
 
-    IdentityEntryAdapter(List<IdentityEntry> dataSet, Context context)
+    IdentityEntryAdapter(List<Identity> dataSet, Context context)
     {
         super(context, R.layout.identity_entry_view, dataSet);
         this.mContext = context;
@@ -27,7 +26,7 @@ public class IdentityEntryAdapter extends ArrayAdapter<IdentityEntry>
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        IdentityEntry ie = getItem(position);
+        Identity ie = getItem(position);
         if(convertView == null)
         {
             LayoutInflater inflater = LayoutInflater.from(getContext());

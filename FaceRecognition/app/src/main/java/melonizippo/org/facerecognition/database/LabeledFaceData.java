@@ -4,20 +4,20 @@ import android.media.FaceDetector;
 
 public class LabeledFaceData extends FaceData {
 
-    private String label;
+    private Identity label;
 
-    public LabeledFaceData(FaceData faceData, String label)
+    public LabeledFaceData(FaceData faceData, Identity label)
     {
         this.features = faceData.features;
         this.faceMat = faceData.faceMat;
         this.label = label;
     }
 
-    public String getLabel() {
+    public Identity getLabel() {
         return label;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(Identity label) {
         this.label = label;
     }
 }

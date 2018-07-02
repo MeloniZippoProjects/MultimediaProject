@@ -1,32 +1,51 @@
 package melonizippo.org.facerecognition.facerecognition;
 
 import android.support.annotation.NonNull;
+import android.text.SpannableString;
+
+import melonizippo.org.facerecognition.database.Identity;
 
 public class PredictedClass implements Comparable<PredictedClass> {
 	
-	private String label;
-	private double conf;
+	private Identity identity;
+	private double confidence;
 	
-	public PredictedClass(String label, double conf) {
-		this.label = label;
-		this.conf = conf;
+	public PredictedClass(Identity identity, double confidence) {
+		this.identity = identity;
+		this.confidence = confidence;
 	}
-	
+
+	public boolean getAuthorized()
+	{
+		return identity.authorized;
+	}
+
 	public String getLabel() {
-		return label;
+		if(identity == null)
+			return "unknown";
+		else
+			return identity.label;
 	}
+
 	public double getConfidence() {
-		return conf;
+		return confidence;
 	}
 
 	@Override
 	public int compareTo(@NonNull PredictedClass o) {
-		return -Double.compare(conf, o.conf);
+		return -Double.compare(confidence, o.confidence);
 	}
-	
+
+	public SpannableString toStyledString()
+	{
+		//todo: return styled string (red if not authorized)
+		return null;
+	}
+
 	@Override
-	public String toString() {
-		return label + "=" + conf;
+	public String toString()
+	{
+		//todo: do pretty print here
+		return identity.label + "=" + confidence;
 	}
-	
 }

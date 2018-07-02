@@ -307,8 +307,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         if(executorService.classifyFaces(mImage, faces))
             Log.d(TAG, "Queued an image for labeling");
 
-        //todo: if intruder, send alarm and store it
-
         Bitmap processedBitmap = Bitmap.createBitmap(mImage.cols(), mImage.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mImage, processedBitmap);
 

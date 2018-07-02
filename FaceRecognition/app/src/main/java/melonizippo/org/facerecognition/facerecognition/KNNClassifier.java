@@ -3,7 +3,7 @@ package melonizippo.org.facerecognition.facerecognition;
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
-import melonizippo.org.facerecognition.database.IdentityEntry;
+import melonizippo.org.facerecognition.database.Identity;
 import melonizippo.org.facerecognition.database.LabeledFaceData;
 import melonizippo.org.facerecognition.deep.Parameters;
 
@@ -13,7 +13,7 @@ public class KNNClassifier {
 
 	private FaceDatabase faceDatabase;
 
-	private static final PredictedClass unknownPerson = new PredictedClass("unknown", 1d);
+	private static final PredictedClass unknownPerson = new PredictedClass(null, 1d);
 
 	public KNNClassifier()
 	{
@@ -27,11 +27,11 @@ public class KNNClassifier {
 		TreeMap<Double, LabeledFaceData> sortedFaceData = new TreeMap<>();
 
 		//check on known identities
-		for(IdentityEntry identityEntry : faceDatabase.knownIdentities)
+		for(Identity identity : faceDatabase.knownIdentities)
 		{
-			for(FaceData faceData : identityEntry.identityDataset)
+			for(FaceData faceData : identity.identityDataset)
 			{
-				LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, identityEntry.label);
+				LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, identity);
 				double similarity = labeledFaceData.getSimilarity(query);
 				sortedFaceData.put(similarity, labeledFaceData);
 			}
@@ -40,7 +40,7 @@ public class KNNClassifier {
 		//check in uncategorized data
 		for(FaceData faceData : faceDatabase.uncategorizedData)
 		{
-			LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, "unknown");
+			LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, null);
 			double similarity = labeledFaceData.getSimilarity(query);
 			sortedFaceData.put(similarity, labeledFaceData);
 		}
@@ -78,16 +78,16 @@ public class KNNClassifier {
 	}
 
 
-	//TODO
+	//todo: refactor "label" names to "identity" ones
 	private PredictedClass getBestLabel(List<Map.Entry<Double,LabeledFaceData>> results) {
 		//Loop in the results list and retrieve the best label
 
-		HashMap<String, Double> labelScores = new HashMap<>();
-		HashMap<String, Double> bestLabelsScore = new HashMap<>();
+		HashMap<Identity, Double> labelScores = new HashMap<>();
+		HashMap<Identity, Double> bestLabelsScore = new HashMap<>();
 
 		for(Map.Entry<Double,LabeledFaceData> descriptor : results)
 		{
-			String label = descriptor.getValue().getLabel();
+			Identity label = descriptor.getValue().getLabel();
 			Double currentLabelScore = labelScores.getOrDefault(label, 0d);
 			labelScores.put(label, currentLabelScore + descriptor.getKey());
 
@@ -96,12 +96,12 @@ public class KNNClassifier {
 				bestLabelsScore.put(label, descriptor.getKey());
 		}
 
-		Optional<Map.Entry<String,Double>> bestLabelOptional = labelScores.entrySet().stream().
+		Optional<Map.Entry<Identity,Double>> bestLabelOptional = labelScores.entrySet().stream().
 				max(Comparator.comparing(Map.Entry::getValue));
 
 		if(bestLabelOptional.isPresent())
 		{
-			String bestLabel = bestLabelOptional.get().getKey();
+			Identity bestLabel = bestLabelOptional.get().getKey();
 			Double confidence = bestLabelsScore.get(bestLabel);
 
 			return new PredictedClass(bestLabel, confidence);

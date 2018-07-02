@@ -57,6 +57,7 @@ public class FaceDetectionExecutor {
                     return;
                 }
 
+                //todo: we do not need LabeledRects
                 List<LabeledRect> labeledRects = new LinkedList<>();
 
                 for (Rect face : faces.toArray()) {
@@ -64,6 +65,7 @@ public class FaceDetectionExecutor {
                     float[] faceFeatures = extractor.extract(faceMat);
                     FaceData query = new FaceData(faceMat, faceFeatures);
                     PredictedClass predict = knnClassifier.predict(query);
+                    //todo: if intruder, send alarm and store it
 
                     LabeledRect labeledRect = new LabeledRect(face, predict.getLabel() + "(" + predict.getConfidence() + ")", predict.getConfidence());
                     //LabeledRect labeledRect = new LabeledRect(face, "enrico" + "(" + 1 + ")", 1d);

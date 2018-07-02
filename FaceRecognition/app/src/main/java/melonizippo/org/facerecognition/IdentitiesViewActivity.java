@@ -28,7 +28,7 @@ import java.io.ObjectOutputStream;
 
 import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
-import melonizippo.org.facerecognition.database.IdentityEntry;
+import melonizippo.org.facerecognition.database.Identity;
 
 public class IdentitiesViewActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
@@ -193,7 +193,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         TextView textView = findViewById(R.id.TextView);
         String text = db.knownIdentities.size() + " known identities:\n";
-        for(IdentityEntry ie : db.knownIdentities)
+        for(Identity ie : db.knownIdentities)
         {
             text += "Label: " + ie.label +
                     ", authorized: " + ie.authorized +
