@@ -18,8 +18,6 @@ import android.widget.GridView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
@@ -28,17 +26,11 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
 
     private final static String TAG = "SelectFromUnclassifiedActivity";
 
-    //private List<FaceData> faceDataset = new ArrayList<>();
     private Map<Integer, FaceData> unclassifiedFaces;
-    private static UnclassifiedFacesAdapter unclassifiedFacesAdapter;
-    private Set<Integer> selectedPositions = new TreeSet<>();
+    private UnclassifiedFacesAdapter unclassifiedFacesAdapter;
     List<Integer> idIndexMapping = new ArrayList<>();
 
     private GridView previewsView;
-
-    private static final String LABEL_TEXT_KEY = "identity_label_text";
-    private static final String DATASET_KEY = "face_dataset";
-    private static final String IS_DEFAULT_LABEL_KEY = "is_default_label";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +38,6 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_from_unclassified);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //Load saved state
-        if(savedInstanceState != null)
-        {
-            //add checked state
-        }
 
         //Setup grid view
         unclassifiedFaces = FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces;
@@ -63,22 +49,30 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
         previewsView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         previewsView.setMultiChoiceModeListener(new MultiChoiceModeListener());
 
-        /*
-        //this should reset selection
-        Button clearFormButton = findViewById(R.id.clearFormButton);
-        clearFormButton.setOnClickListener((view) -> clearForm());
+        //Setup listeners
+        Button selectAllButton = findViewById(R.id.selectAllButton);
+        selectAllButton.setOnClickListener((view) -> selectAll());
 
-        //this clears placeholder text
-        labelField.setOnClickListener(view -> clearPlaceholderText());
-        labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
-        */
+        Button deselectAllButton = findViewById(R.id.deselectAllButton);
+        deselectAllButton.setOnClickListener((view) -> deselectAll());
 
-        //this should commit new identity
-        Button saveIdentityButton = findViewById(R.id.addSelectedButton);
-        saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
+        Button addSelectedButton = findViewById(R.id.addSelectedButton);
+        addSelectedButton.setOnClickListener(view -> commitSelection());
     }
 
-    private void commitAddIdentity()
+    private void selectAll()
+    {
+        for(int i = 0; i < previewsView.getCount(); i++)
+            previewsView.setItemChecked(i, true);
+    }
+
+    private void deselectAll()
+    {
+        for(int i = 0; i < previewsView.getCount(); i++)
+            previewsView.setItemChecked(i, false);
+    }
+
+    private void commitSelection()
     {
         StringBuilder s = new StringBuilder("Selected items: ");
 
@@ -96,17 +90,17 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
         s.delete(s.length() - 2, s.length());
         Log.i(TAG, s.toString());
 
-        int[] result = new int[selectedIds.size()];
+        int[] selectedIdsArray = new int[selectedIds.size()];
         for(int i = 0; i < selectedIds.size(); i++)
-            result[i] = selectedIds.get(i);
+            selectedIdsArray[i] = selectedIds.get(i);
 
-        sendBackResult(result);
+        sendBackResult(selectedIdsArray);
     }
 
-    private void sendBackResult(int[] result)
+    private void sendBackResult(int[] selectedIDs)
     {
         Intent data = new Intent();
-        data.putExtra("selectedIDs", result);
+        data.putExtra("selectedIDs", selectedIDs);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -144,11 +138,6 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
                     mode.setSubtitle("" + selectCount + " items selected");
                     break;
             }
-
-            if(checked)
-                selectedPositions.add(position);
-            else
-                selectedPositions.remove(position);
         }
     }
 
@@ -197,7 +186,6 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
             UnclassifiedFaceView faceView = (convertView == null) ?
                     new UnclassifiedFaceView(SelectFromUnclassifiedActivity.this) : (UnclassifiedFaceView) convertView;
             faceView.setContent(fd.toBitmap());
-            faceView.setChecked(SelectFromUnclassifiedActivity.this.selectedPositions.contains(position));
             return faceView;
         }
     }

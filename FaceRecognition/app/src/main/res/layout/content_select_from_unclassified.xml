@@ -33,7 +33,7 @@
             android:orientation="horizontal"
             style="?android:buttonBarStyle">
             <Button
-                android:id="@+id/unselectAllButton"
+                android:id="@+id/deselectAllButton"
                 android:text="@string/unselectAllButtonText"
 
                 style="?android:buttonBarButtonStyle"
