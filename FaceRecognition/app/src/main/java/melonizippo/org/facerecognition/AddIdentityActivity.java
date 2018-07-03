@@ -1,6 +1,7 @@
 package melonizippo.org.facerecognition;
 
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -37,6 +38,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
@@ -223,12 +225,13 @@ public class AddIdentityActivity extends AppCompatActivity
         }
 
         FaceDatabase fd = FaceDatabaseStorage.getFaceDatabase();
-        if(
-                fd.knownIdentities.stream().anyMatch(
-                        (dbIdentity) -> dbIdentity.label.matches(identity.label))
-                )
+        Optional<Identity> dbIdentityMatch = fd.knownIdentities.stream()
+                .filter((dbIdentity) -> dbIdentity.label.matches(identity.label))
+                .findAny();
+
+        if(dbIdentityMatch.isPresent())
         {
-            showSnackBar(R.string.error_name_duplicate);
+            askToAddSamples(identity, dbIdentityMatch.get());
             return false;
         }
 
@@ -248,6 +251,25 @@ public class AddIdentityActivity extends AppCompatActivity
         }
 
         return true;
+    }
+
+    private void askToAddSamples(Identity identity, Identity dbIdentity)
+    {
+        new AlertDialog.Builder(this)
+                .setTitle("Name already used")
+                .setMessage("Do you want to add the samples to the same identity?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        dbIdentity.identityDataset.addAll(identity.identityDataset);
+                        cleanupUnclassifiedIds();
+                        FaceDatabaseStorage.storeToInternalStorage();
+
+                        showSnackBar(R.string.info_edit_success);
+                        clearForm();
+                    }})
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     private void clearForm()
