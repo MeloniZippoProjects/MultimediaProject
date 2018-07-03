@@ -10,17 +10,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
@@ -36,7 +44,9 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
     private final static String TAG = "AddUnknownIdentityActivity";
 
     //private List<FaceData> faceDataset = new ArrayList<>();
-    private static FaceDataAdapter faceDataAdapter;
+    private Map<Integer, FaceData> uncategorizedFaces;
+    private static UncategorizedFaceAdapter uncategorizedFaceAdapter;
+    private Set<Integer> selectedIds = new TreeSet<>();
 
     private FaceDetector faceDetector;
     private DNNExtractor extractor;
@@ -76,11 +86,10 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         */
 
         //Setup grid view
-        List<FaceData> faceDataset = new ArrayList<>(FaceDatabaseStorage.getFaceDatabase().uncategorizedData.values());
-        faceDataAdapter = new FaceDataAdapter(faceDataset, getApplicationContext());
+        uncategorizedFaces = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
+        uncategorizedFaceAdapter = new UncategorizedFaceAdapter(uncategorizedFaces);
         previewsView = findViewById(R.id.previewsView);
-        previewsView.setAdapter(faceDataAdapter);
-
+        previewsView.setAdapter(uncategorizedFaceAdapter);
 
         previewsView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         previewsView.setMultiChoiceModeListener(new MultiChoiceModeListener());
@@ -93,11 +102,23 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         //this clears placeholder text
         labelField.setOnClickListener(view -> clearPlaceholderText());
         labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
+        */
 
         //this should commit new identity
         Button saveIdentityButton = findViewById(R.id.saveIdentityButton);
         saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
-        */
+    }
+
+    private void commitAddIdentity()
+    {
+        StringBuilder s = new StringBuilder("Selected items: ");
+        for (Integer i :
+                selectedIds)
+        {
+            s.append(i).append(", ");
+        }
+        s.delete(s.length() - 2, s.length());
+        Log.i(TAG, s.toString());
     }
 
     public class MultiChoiceModeListener implements
@@ -119,10 +140,12 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         public void onDestroyActionMode(ActionMode mode) {
         }
 
-        public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                              long id, boolean checked) {
+        public void onItemCheckedStateChanged(
+                ActionMode mode, int position, long id, boolean checked)
+        {
             int selectCount = previewsView.getCheckedItemCount();
-            switch (selectCount) {
+            switch (selectCount)
+            {
                 case 1:
                     mode.setSubtitle("One item selected");
                     break;
@@ -131,13 +154,13 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
                     break;
             }
 
-            View clickedImage = previewsView.getChildAt(position);
+            UncategorizedFaceView clickedFaceView = (UncategorizedFaceView) previewsView.getChildAt(position);
+            clickedFaceView.setChecked(checked);
             if(checked)
-                clickedImage.setBackgroundColor(Color.parseColor("#669df4"));
+                selectedIds.add(position);
             else
-                clickedImage.setBackgroundColor(Color.parseColor("#ffffff"));
+                selectedIds.remove(position);
         }
-
     }
 
     @Override
@@ -148,90 +171,47 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         outState.putBoolean(IS_DEFAULT_LABEL_KEY, isDefaultLabel);
     }
 
-
-    /*
-    private void commitAddIdentity()
+    public class UncategorizedFaceAdapter extends BaseAdapter
     {
-        Identity identity = new Identity();
-        identity.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
-        identity.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
-        identity.identityDataset = new ArrayList<>(faceDataset);
+        Map<Integer, FaceData> uncategorizedFaces;
+        List<Integer> selectedPositions = new ArrayList<>();
 
-        if(!validateIdentity(identity))
-            return;
-        else
+        UncategorizedFaceAdapter(Map<Integer, FaceData> uncategorizedFaces)
         {
-            FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identity);
-            FaceDatabaseStorage.storeToInternalStorage();
-
-            showSnackBar(R.string.info_add_success);
-            clearForm();
-        }
-    }
-
-    private void clearForm()
-    {
-        labelField.getText().clear();
-        faceDataset.clear();
-        faceDataAdapter.notifyDataSetChanged();
-
-        Log.i(TAG, "Form cleared");
-    }
-
-    private boolean validateIdentity(Identity identity)
-    {
-        if(identity.label.matches(""))
-        {
-            showSnackBar(R.string.error_no_name);
-            return false;
+            this.uncategorizedFaces = uncategorizedFaces;
         }
 
-        FaceDatabase fd = FaceDatabaseStorage.getFaceDatabase();
-        if(
-                fd.knownIdentities.stream().anyMatch(
-                        (dbIdentity) -> dbIdentity.label.matches(identity.label))
-                )
+        @Override
+        public int getCount()
         {
-            showSnackBar(R.string.error_name_duplicate);
-            return false;
+            return uncategorizedFaces.size();
         }
 
-        identity.filterDuplicatesFromDataset();
-
-        int datasetCount = identity.identityDataset.size();
-        if(datasetCount < Parameters.MIN_IDENTITY_SAMPLES)
+        @Override
+        public Object getItem(int position)
         {
-            Resources res = getResources();
-            String errorMessage = getString(R.string.error_not_enough_samples, Parameters.MIN_IDENTITY_SAMPLES);
-            Snackbar errorBar = Snackbar.make(
-                    findViewById(R.id.addIdentityCoordinatorLayout),
-                    errorMessage,
-                    Snackbar.LENGTH_SHORT);
-            errorBar.show();
-            return false;
+            return uncategorizedFaces.get(position);
         }
 
-        return true;
-    }
-
-    private void showSnackBar(int stringId)
-    {
-        Snackbar errorBar = Snackbar.make(
-                findViewById(R.id.addIdentityCoordinatorLayout),
-                stringId,
-                Snackbar.LENGTH_SHORT);
-        errorBar.show();
-    }
-
-    private void clearPlaceholderText()
-    {
-        if(isDefaultLabel)
+        @Override
+        public long getItemId(int position)
         {
-            labelField.getText().clear();
-            isDefaultLabel = false;
+            return position;
+        }
+
+        @Override
+        public View getView(
+                int position,
+                View convertView,
+                ViewGroup parent)
+        {
+            FaceData fd = (FaceData) getItem(position);
+
+            UncategorizedFaceView faceView = (convertView == null) ?
+                    new UncategorizedFaceView(AddUnknownIdentityActivity.this) : (UncategorizedFaceView) convertView;
+            faceView.setContent(fd.toBitmap());
+            faceView.setChecked(AddUnknownIdentityActivity.this.selectedIds.contains(position));
+            return faceView;
         }
     }
-
-    */
-
 }

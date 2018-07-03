@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
     <ImageView
-        android:id="@+id/facePreview"
+        android:id="@+id/faceView"
         android:contentDescription="@string/face_sample_description"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:scaleType="centerInside"
         android:layout_margin="5dp"/>
-</android.support.constraint.ConstraintLayout>
+</merge>
