@@ -128,16 +128,16 @@ public class AddIdentityActivity extends AppCompatActivity
         previewsView.setAdapter(faceDataAdapter);
 
         //Setup listeners
-        Button addSamplesButton = findViewById(R.id.addSamplesButton);
-        addSamplesButton.setOnClickListener((view) -> showPictureDialog());
-
-        Button clearFormButton = findViewById(R.id.unselectAllButton);
-        clearFormButton.setOnClickListener((view) -> clearForm());
-
         labelField.setOnClickListener(view -> clearPlaceholderText());
         labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
 
-        Button saveIdentityButton = findViewById(R.id.addSelectedButton);
+        Button addSamplesButton = findViewById(R.id.addSamplesButton);
+        addSamplesButton.setOnClickListener((view) -> showPictureDialog());
+
+        Button clearFormButton = findViewById(R.id.clearFormButton);
+        clearFormButton.setOnClickListener((view) -> clearForm());
+
+        Button saveIdentityButton = findViewById(R.id.saveIdentityButton);
         saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
     }
 
