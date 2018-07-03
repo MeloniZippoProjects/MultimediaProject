@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -62,11 +63,11 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_save);
 
         //Setup list view
-        FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
-        identitiesList.addAll(db.knownIdentities);
         identityEntryAdapter = new IdentityEntryAdapter(identitiesList, getApplicationContext());
         ListView identitiesView = findViewById(R.id.identitiesView);
         identitiesView.setAdapter(identityEntryAdapter);
+
+        updateView();
 
         FloatingActionButton addIdentityButton = findViewById(R.id.addIdentity);
         addIdentityButton.setOnClickListener((view) -> {
@@ -96,18 +97,24 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
+        boolean result = true;
         switch (item.getItemId())
         {
             case R.id.exportItem:
-                exportDatabase();
+                result = exportDatabase();
                 break;
             case R.id.importItem:
-                importDatabase();
+                result = importDatabase();
                 break;
             case R.id.clearDatabase:
                 clearDatabase();
                 break;
         }
+
+        if(result)
+            Snackbar.make(findViewById(R.id.identitiesView), "Operation completed", Snackbar.LENGTH_SHORT);
+        else
+            Snackbar.make(findViewById(R.id.identitiesView), "Operation failed", Snackbar.LENGTH_SHORT);
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -118,6 +125,11 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
     {
         super.onResume();
         updateText();
+        updateView();
+    }
+
+    private void updateView()
+    {
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
         identitiesList.clear();
         identitiesList.addAll(db.knownIdentities);
@@ -195,6 +207,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
     {
         FaceDatabaseStorage.clear();
         updateText();
+        updateView();
     }
 
     private void updateText()
