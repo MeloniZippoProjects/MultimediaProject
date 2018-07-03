@@ -41,17 +41,23 @@
             android:name=".streaming.Camera2FaceRecognition"
             android:label="@string/title_activity_camera2_face_recognition"
             android:theme="@style/AppTheme.NoActionBar">
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".AddUnknownIdentityActivity"
             android:label="@string/title_activity_add_unknown_identity"
             android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
