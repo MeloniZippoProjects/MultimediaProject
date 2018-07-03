@@ -18,8 +18,7 @@ public class KNNClassifier {
 		faceDatabase = FaceDatabaseStorage.getFaceDatabase();
 	}
 
-	//TODO
-	public PredictedClass predict(FaceData queryFaceData) {
+	public PredictedClass classify(FaceData queryFaceData) {
 		//perform a kNN similarity search and call getBestClass to retrieve the best label
 
 		TreeMap<Double, LabeledFaceData> sortedFaceData = new TreeMap<>();

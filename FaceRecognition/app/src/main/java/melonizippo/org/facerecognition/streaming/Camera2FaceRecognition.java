@@ -86,7 +86,6 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
         faceDetector = app.faceDetector;
 
-        //todo: get it from savedInstanceState
         if(savedInstanceState != null)
             currentCameraId = savedInstanceState.getString("currentCamera");
         else
@@ -268,9 +267,11 @@ public class Camera2FaceRecognition extends AppCompatActivity {
         }
     };
 
-    private ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener() {
+    private ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener()
+    {
         @Override
-        public void onImageAvailable(ImageReader reader) {
+        public void onImageAvailable(ImageReader reader)
+        {
             Image image = reader.acquireNextImage();
             Bitmap bitmap = processImage(image);
             image.close();
@@ -283,7 +284,8 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     };
 
     private Mat mImage = new Mat();
-    private Bitmap processImage(Image image) {
+    private Bitmap processImage(Image image)
+    {
         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
         byte[] bytes = new byte[buffer.capacity()];
         buffer.get(bytes);

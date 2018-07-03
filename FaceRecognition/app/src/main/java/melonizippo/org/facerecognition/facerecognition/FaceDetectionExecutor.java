@@ -70,7 +70,7 @@ public class FaceDetectionExecutor {
                     float[] faceFeatures = extractor.extract(faceMat);
                     FaceData query = new FaceData(faceMat, faceFeatures);
 
-                    PredictedClass predict = knnClassifier.predict(query);
+                    PredictedClass predict = knnClassifier.classify(query);
 
                     predictedClasses.add(predict);
                 }

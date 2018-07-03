@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.Identity;
+import melonizippo.org.facerecognition.deep.Parameters;
 
 public class PredictedClass implements Comparable<PredictedClass>
 {
@@ -44,7 +45,12 @@ public class PredictedClass implements Comparable<PredictedClass>
 	public String getLabel()
 	{
 		if(identity == null)
-			return "Not classified";
+		{
+			if(confidence < Parameters.MIN_CONFIDENCE)
+				return "Unclassified";
+			else
+				return "Unknown";
+		}
 		else
 			return identity.label;
 	}
