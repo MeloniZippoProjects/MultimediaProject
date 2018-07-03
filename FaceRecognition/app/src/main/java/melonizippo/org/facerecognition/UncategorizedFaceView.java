@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -31,10 +32,15 @@ public class UncategorizedFaceView extends FrameLayout implements Checkable
     {
         isSelected = checked;
 
+        int nextBackgroundColor;
+
         if(checked)
-            faceView.setBackgroundColor(Color.parseColor("#669df4"));
+            nextBackgroundColor = Color.parseColor("#669df4");
         else
-            faceView.setBackgroundColor(Color.parseColor("#ffffff"));
+            nextBackgroundColor = Color.parseColor("#ffffff");
+
+        View parentView = (View) faceView.getParent();
+        parentView.setBackgroundColor(nextBackgroundColor);
     }
 
     @Override
