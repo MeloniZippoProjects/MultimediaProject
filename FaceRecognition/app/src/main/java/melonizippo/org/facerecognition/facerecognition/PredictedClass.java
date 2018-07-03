@@ -47,9 +47,9 @@ public class PredictedClass implements Comparable<PredictedClass>
 		if(identity == null)
 		{
 			if(confidence < Parameters.MIN_CONFIDENCE)
-				return "Unclassified";
-			else
 				return "Unknown";
+			else
+				return "Unclassified";
 		}
 		else
 			return identity.label;
