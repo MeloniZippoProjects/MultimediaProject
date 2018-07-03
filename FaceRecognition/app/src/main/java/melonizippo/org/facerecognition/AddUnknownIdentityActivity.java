@@ -1,5 +1,6 @@
 package melonizippo.org.facerecognition;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -85,15 +86,34 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
     private void commitAddIdentity()
     {
         StringBuilder s = new StringBuilder("Selected items: ");
+
         SparseBooleanArray checkedItemPositions = previewsView.getCheckedItemPositions();
+        List<Integer> selectedIds = new ArrayList<>();
 
         for(int i = 0; i < uncategorizedFaces.keySet().size(); ++i)
         {
             if(checkedItemPositions.get(i))
+            {
                 s.append(i).append(", ");
+                selectedIds.add(idIndexMapping.get(i));
+            }
         }
         s.delete(s.length() - 2, s.length());
         Log.i(TAG, s.toString());
+
+        int[] result = new int[selectedIds.size()];
+        for(int i = 0; i < selectedIds.size(); i++)
+            result[i] = selectedIds.get(i);
+
+        sendBackResult(result);
+    }
+
+    private void sendBackResult(int[] result)
+    {
+        Intent data = new Intent();
+        data.putExtra("selectedIDs", result);
+        setResult(RESULT_OK, data);
+        finish();
     }
 
     public class MultiChoiceModeListener implements

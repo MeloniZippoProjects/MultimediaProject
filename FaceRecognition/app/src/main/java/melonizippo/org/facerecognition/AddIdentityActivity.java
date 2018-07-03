@@ -36,6 +36,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
@@ -81,6 +82,8 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final String IS_DEFAULT_LABEL_KEY = "is_default_label";
 
     private File faceDatasetFile = null;
+
+    private List<Integer> uncategorizedIdsToRemoveOnCommit = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -204,6 +207,7 @@ public class AddIdentityActivity extends AppCompatActivity
         else
         {
             FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identity);
+            cleanupUncategorizedIds();
             FaceDatabaseStorage.storeToInternalStorage();
 
             showSnackBar(R.string.info_add_success);
@@ -372,7 +376,7 @@ public class AddIdentityActivity extends AppCompatActivity
     private void choosePhotosFromUncategorized()
     {
         Intent intent = new Intent(AddIdentityActivity.this, AddUnknownIdentityActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, PICK_IMAGE_MULTIPLE_UNCATEGORIZED);
     }
 
     @Override
@@ -397,14 +401,42 @@ public class AddIdentityActivity extends AppCompatActivity
             }
             else if (requestCode == PICK_IMAGE_MULTIPLE_UNCATEGORIZED && data != null)
             {
-                processImages(data);
-                //todo: cleanup phase
+                processUncategorizedImages(data);
             }
             else if ( (requestCode == SHOOT_VIDEO || requestCode == PICK_VIDEO) && data != null)
             {
                 processVideo(data);
             }
         }
+    }
+
+    private void processUncategorizedImages(Intent data)
+    {
+        int[] ids = data.getIntArrayExtra("selectedIDs");
+        if(ids.length < 1)
+            return;
+
+        Map<Integer, FaceData> uncategorizedData = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
+        for (int id : ids)
+        {
+            if(uncategorizedIdsToRemoveOnCommit.contains(id))
+                continue;
+
+            FaceData faceData = uncategorizedData.get(id);
+            faceDataset.add(faceData);
+            faceDataAdapter.notifyDataSetChanged();
+
+            //delayed cleanup
+            uncategorizedIdsToRemoveOnCommit.add(id);
+        }
+    }
+
+    private void cleanupUncategorizedIds()
+    {
+        Map<Integer, FaceData> uncategorizedData = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
+        for (Integer id : uncategorizedIdsToRemoveOnCommit)
+            uncategorizedData.remove(id);
+        uncategorizedIdsToRemoveOnCommit.clear();
     }
 
     private void processImages(Intent data)
@@ -463,14 +495,16 @@ public class AddIdentityActivity extends AppCompatActivity
         addImage(imageBitmap);
     }
 
-    private Mat imageMat = new Mat();
     private void addImage(Bitmap imageBitmap)
     {
         imageBitmap = scaleBitmap(imageBitmap);
-
         Utils.bitmapToMat(imageBitmap, imageMat);
+        addImage(imageMat);
+    }
 
-
+    private Mat imageMat = new Mat();
+    private void addImage(Mat imageMat)
+    {
         MatOfRect facesMat = faceDetector.detect(imageMat);
         Rect[] faces = facesMat.toArray();
 
