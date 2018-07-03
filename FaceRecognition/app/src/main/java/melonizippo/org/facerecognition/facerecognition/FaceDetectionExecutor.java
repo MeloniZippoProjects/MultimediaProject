@@ -49,42 +49,50 @@ public class FaceDetectionExecutor {
             return false;
 
         Runnable task = () -> {
-            try {
-                if(faces.toList().size() == 0)
+            try
+            {
+                if (faces.toList().size() == 0)
                 {
                     updateClassificationText("No face detected");
                     return;
                 }
 
-                //todo: check bad db states
-                if(FaceDatabaseStorage.getFaceDatabase().getSampleCount() < Parameters.K)
-                {
-                    updateClassificationText("Not enough samples in database for classification");
-                    return;
-                }
+                boolean enoughSamplesInDb = FaceDatabaseStorage.getFaceDatabase().getSampleCount() >= Parameters.K;
 
                 List<PredictedClass> predictedClasses = new LinkedList<>();
+                List<FaceData> unclassifiedFaces = new LinkedList<>();
                 for (Rect face : faces.toArray())
                 {
                     faceMat = frameMat.submat(face);
                     float[] faceFeatures = extractor.extract(faceMat);
-                    FaceData query = new FaceData(faceMat, faceFeatures);
+                    FaceData queryFaceData = new FaceData(faceMat, faceFeatures);
 
-                    PredictedClass predict = knnClassifier.classify(query);
-
-                    predictedClasses.add(predict);
+                    if (!enoughSamplesInDb)
+                        unclassifiedFaces.add(queryFaceData);
+                    else
+                    {
+                        PredictedClass predictedClass = knnClassifier.classify(queryFaceData);
+                        predictedClasses.add(predictedClass);
+                        if (!predictedClass.isClassified())
+                            unclassifiedFaces.add(queryFaceData);
+                    }
                 }
 
                 logAndStoreService.submit(
-                        () -> logAndStore(predictedClasses));
+                        () -> storeUnclassifiedFaces(unclassifiedFaces));
 
-                StringBuilder stringBuilder = new StringBuilder("");
-                for (PredictedClass predictedClass: predictedClasses)
+                if (enoughSamplesInDb)
                 {
-                    stringBuilder.append(predictedClass.toString()).append("\n");
-                }
+                    StringBuilder stringBuilder = new StringBuilder("");
+                    for (PredictedClass predictedClass : predictedClasses)
+                    {
+                        stringBuilder.append(predictedClass.toString()).append("\n");
+                    }
 
-                updateClassificationText(stringBuilder.toString());
+                    updateClassificationText(stringBuilder.toString());
+                }
+                else
+                    updateClassificationText("Not enough samples in database for classification");
             }
             catch(Exception ex)
             {
@@ -101,23 +109,16 @@ public class FaceDetectionExecutor {
         return true;
     }
 
-    private void logAndStore(List<PredictedClass> predictedClasses)
+    private void storeUnclassifiedFaces(List<FaceData> faces)
     {
-        boolean databaseChanged = false;
-        for (PredictedClass predictedClass: predictedClasses)
+        if(faces.size() < 1) return;
+
+        for(FaceData faceData : faces)
         {
-            //todo: add log entry?
-
-            if (!predictedClass.isClassified())
-            {
-                FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
-                db.unclassifiedFaces.put(db.nextMapId.incrementAndGet(), predictedClass.getFaceData());
-                databaseChanged = true;
-            }
+            FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
+            db.unclassifiedFaces.put(db.nextMapId.incrementAndGet(), faceData);
         }
-
-        if(databaseChanged)
-            FaceDatabaseStorage.storeToInternalStorage();
+        FaceDatabaseStorage.storeToInternalStorage();
     }
 
     private void updateClassificationText(String newLabel)
