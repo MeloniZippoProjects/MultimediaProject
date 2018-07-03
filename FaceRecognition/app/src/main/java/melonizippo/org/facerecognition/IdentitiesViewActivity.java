@@ -43,7 +43,9 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
     private IdentityEntryAdapter identityEntryAdapter;
+    private List<Identity> identitiesList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,7 +63,6 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
 
         //Setup list view
         FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
-        List<Identity> identitiesList = new ArrayList<>();
         identitiesList.addAll(db.knownIdentities);
         identityEntryAdapter = new IdentityEntryAdapter(identitiesList, getApplicationContext());
         ListView identitiesView = findViewById(R.id.identitiesView);
@@ -117,6 +118,10 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
     {
         super.onResume();
         updateText();
+        FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
+        identitiesList.clear();
+        identitiesList.addAll(db.knownIdentities);
+        identityEntryAdapter.notifyDataSetChanged();
     }
 
     public static void verifyStoragePermissions(Activity activity) {
