@@ -16,38 +16,40 @@ import android.widget.Button;
 import android.widget.GridView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 
-public class SelectFromUnclassifiedActivity extends AppCompatActivity {
-
+public class SelectFromUnclassifiedActivity extends AppCompatActivity
+{
     private final static String TAG = "SelectFromUnclassifiedActivity";
 
-    private Map<Integer, FaceData> unclassifiedFaces;
+    private Map<Integer, FaceData> unclassifiedFaces = new HashMap<>();
     private UnclassifiedFacesAdapter unclassifiedFacesAdapter;
     List<Integer> idIndexMapping = new ArrayList<>();
 
     private GridView previewsView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_from_unclassified);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Setup grid view
-        unclassifiedFaces = FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces;
-        idIndexMapping.addAll(unclassifiedFaces.keySet());
-        unclassifiedFacesAdapter = new UnclassifiedFacesAdapter(unclassifiedFaces);
         previewsView = findViewById(R.id.previewsView);
-        previewsView.setAdapter(unclassifiedFacesAdapter);
-
         previewsView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         previewsView.setMultiChoiceModeListener(new MultiChoiceModeListener());
+
+        unclassifiedFacesAdapter = new UnclassifiedFacesAdapter(unclassifiedFaces);
+        previewsView.setAdapter(unclassifiedFacesAdapter);
+
+        loadUnclassifiedFaces();
 
         //Setup listeners
         Button selectAllButton = findViewById(R.id.selectAllButton);
@@ -58,6 +60,25 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity {
 
         Button addSelectedButton = findViewById(R.id.addSelectedButton);
         addSelectedButton.setOnClickListener(view -> commitSelection());
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        loadUnclassifiedFaces();
+    }
+
+    private void loadUnclassifiedFaces()
+    {
+        unclassifiedFaces.putAll(FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces);
+        int[] filteredIds = getIntent().getIntArrayExtra("filteredIds");
+        if(filteredIds != null)
+            for(int id : filteredIds)
+                unclassifiedFaces.remove(id);
+
+        idIndexMapping.addAll(unclassifiedFaces.keySet());
+        unclassifiedFacesAdapter.notifyDataSetChanged();
     }
 
     private void selectAll()

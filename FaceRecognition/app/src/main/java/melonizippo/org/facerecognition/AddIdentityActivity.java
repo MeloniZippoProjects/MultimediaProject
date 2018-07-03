@@ -255,6 +255,7 @@ public class AddIdentityActivity extends AppCompatActivity
         labelField.getText().clear();
         faceDataset.clear();
         faceDataAdapter.notifyDataSetChanged();
+        unclassifiedIdsToRemoveOnCommit.clear();
 
         Log.i(TAG, "Form cleared");
     }
@@ -375,6 +376,15 @@ public class AddIdentityActivity extends AppCompatActivity
     private void choosePhotosFromUnclassified()
     {
         Intent intent = new Intent(AddIdentityActivity.this, SelectFromUnclassifiedActivity.class);
+        if(unclassifiedIdsToRemoveOnCommit.size() > 0)
+        {
+            int[] filteredIds = new int[unclassifiedIdsToRemoveOnCommit.size()];
+            for(int i = 0; i < filteredIds.length; i++)
+                filteredIds[i] = unclassifiedIdsToRemoveOnCommit.get(i);
+
+            intent.putExtra("filteredIds", filteredIds);
+        }
+
         startActivityForResult(intent, PICK_IMAGE_MULTIPLE_UNCLASSIFIED);
     }
 
