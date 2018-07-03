@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FaceDatabase implements Serializable
 {
     public Set<Identity> knownIdentities = new ConcurrentSkipListSet<>();
-    public Map<Integer, FaceData> uncategorizedData = new ConcurrentHashMap<>();
+    public Map<Integer, FaceData> unclassifiedFaces = new ConcurrentHashMap<>();
     public AtomicInteger nextMapId = new AtomicInteger(0);
 
     public int getSampleCount()

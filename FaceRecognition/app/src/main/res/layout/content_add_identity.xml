@@ -53,8 +53,8 @@
             android:orientation="horizontal"
             style="?android:buttonBarStyle">
             <Button
-                android:id="@+id/clearFormButton"
-                android:text="@string/clearFormButtonText"
+                android:id="@+id/unselectAllButton"
+                android:text="@string/unselectAllButtonText"
 
                 style="?android:buttonBarButtonStyle"
                 android:layout_width="0dp"
@@ -62,8 +62,8 @@
                 android:layout_height="wrap_content"
             />
             <Button
-                android:id="@+id/saveIdentityButton"
-                android:text="@string/saveIdentityButtonText"
+                android:id="@+id/addSelectedButton"
+                android:text="@string/addSelectedButtonText"
 
                 style="?android:buttonBarButtonStyle"
                 android:layout_width="0dp"

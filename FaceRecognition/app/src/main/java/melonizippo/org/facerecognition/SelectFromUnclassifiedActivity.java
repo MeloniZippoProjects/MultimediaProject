@@ -2,7 +2,6 @@ package melonizippo.org.facerecognition;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.Checkable;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -25,17 +23,14 @@ import java.util.TreeSet;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
-import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.facerecognition.FaceDetector;
-import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
-public class AddUnknownIdentityActivity extends AppCompatActivity {
+public class SelectFromUnclassifiedActivity extends AppCompatActivity {
 
-    private final static String TAG = "AddUnknownIdentityActivity";
+    private final static String TAG = "SelectFromUnclassifiedActivity";
 
     //private List<FaceData> faceDataset = new ArrayList<>();
-    private Map<Integer, FaceData> uncategorizedFaces;
-    private static UncategorizedFaceAdapter uncategorizedFaceAdapter;
+    private Map<Integer, FaceData> unclassifiedFaces;
+    private static UnclassifiedFacesAdapter unclassifiedFacesAdapter;
     private Set<Integer> selectedPositions = new TreeSet<>();
     List<Integer> idIndexMapping = new ArrayList<>();
 
@@ -48,7 +43,7 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_unknown_identity);
+        setContentView(R.layout.activity_select_from_unclassified);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -59,11 +54,11 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         }
 
         //Setup grid view
-        uncategorizedFaces = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
-        idIndexMapping.addAll(uncategorizedFaces.keySet());
-        uncategorizedFaceAdapter = new UncategorizedFaceAdapter(uncategorizedFaces);
+        unclassifiedFaces = FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces;
+        idIndexMapping.addAll(unclassifiedFaces.keySet());
+        unclassifiedFacesAdapter = new UnclassifiedFacesAdapter(unclassifiedFaces);
         previewsView = findViewById(R.id.previewsView);
-        previewsView.setAdapter(uncategorizedFaceAdapter);
+        previewsView.setAdapter(unclassifiedFacesAdapter);
 
         previewsView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         previewsView.setMultiChoiceModeListener(new MultiChoiceModeListener());
@@ -79,7 +74,7 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         */
 
         //this should commit new identity
-        Button saveIdentityButton = findViewById(R.id.saveIdentityButton);
+        Button saveIdentityButton = findViewById(R.id.addSelectedButton);
         saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
     }
 
@@ -90,7 +85,7 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         SparseBooleanArray checkedItemPositions = previewsView.getCheckedItemPositions();
         List<Integer> selectedIds = new ArrayList<>();
 
-        for(int i = 0; i < uncategorizedFaces.keySet().size(); ++i)
+        for(int i = 0; i < unclassifiedFaces.keySet().size(); ++i)
         {
             if(checkedItemPositions.get(i))
             {
@@ -150,8 +145,6 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
                     break;
             }
 
-            //UncategorizedFaceView clickedFaceView = (UncategorizedFaceView) previewsView.getItemAtPosition(position);
-            //clickedFaceView.setChecked(checked);
             if(checked)
                 selectedPositions.add(position);
             else
@@ -166,25 +159,25 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         //save checked state
     }
 
-    public class UncategorizedFaceAdapter extends BaseAdapter
+    public class UnclassifiedFacesAdapter extends BaseAdapter
     {
-        Map<Integer, FaceData> uncategorizedFaces;
+        Map<Integer, FaceData> unclassifiedFaces;
 
-        UncategorizedFaceAdapter(Map<Integer, FaceData> uncategorizedFaces)
+        UnclassifiedFacesAdapter(Map<Integer, FaceData> unclassifiedFaces)
         {
-            this.uncategorizedFaces = uncategorizedFaces;
+            this.unclassifiedFaces = unclassifiedFaces;
         }
 
         @Override
         public int getCount()
         {
-            return uncategorizedFaces.size();
+            return unclassifiedFaces.size();
         }
 
         @Override
         public Object getItem(int position)
         {
-            return uncategorizedFaces.get(idIndexMapping.get(position));
+            return unclassifiedFaces.get(idIndexMapping.get(position));
         }
 
         @Override
@@ -201,10 +194,10 @@ public class AddUnknownIdentityActivity extends AppCompatActivity {
         {
             FaceData fd = (FaceData) getItem(position);
 
-            UncategorizedFaceView faceView = (convertView == null) ?
-                    new UncategorizedFaceView(AddUnknownIdentityActivity.this) : (UncategorizedFaceView) convertView;
+            UnclassifiedFaceView faceView = (convertView == null) ?
+                    new UnclassifiedFaceView(SelectFromUnclassifiedActivity.this) : (UnclassifiedFaceView) convertView;
             faceView.setContent(fd.toBitmap());
-            faceView.setChecked(AddUnknownIdentityActivity.this.selectedPositions.contains(position));
+            faceView.setChecked(SelectFromUnclassifiedActivity.this.selectedPositions.contains(position));
             return faceView;
         }
     }

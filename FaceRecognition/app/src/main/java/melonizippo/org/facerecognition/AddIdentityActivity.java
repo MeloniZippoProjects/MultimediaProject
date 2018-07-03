@@ -46,7 +46,6 @@ import melonizippo.org.facerecognition.deep.DNNExtractor;
 import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
-import melonizippo.org.facerecognition.streaming.Camera2FaceRecognition;
 
 public class AddIdentityActivity extends AppCompatActivity
 {
@@ -57,7 +56,7 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final int PICK_VIDEO = 3;
     private static final int SHOOT_IMAGE = 4;
     private static final int SHOOT_VIDEO = 5;
-    private static final int PICK_IMAGE_MULTIPLE_UNCATEGORIZED = 6;
+    private static final int PICK_IMAGE_MULTIPLE_UNCLASSIFIED = 6;
 
     private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
 
@@ -83,7 +82,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private File faceDatasetFile = null;
 
-    private List<Integer> uncategorizedIdsToRemoveOnCommit = new ArrayList<>();
+    private List<Integer> unclassifiedIdsToRemoveOnCommit = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -132,13 +131,13 @@ public class AddIdentityActivity extends AppCompatActivity
         Button addSamplesButton = findViewById(R.id.addSamplesButton);
         addSamplesButton.setOnClickListener((view) -> showPictureDialog());
 
-        Button clearFormButton = findViewById(R.id.clearFormButton);
+        Button clearFormButton = findViewById(R.id.unselectAllButton);
         clearFormButton.setOnClickListener((view) -> clearForm());
 
         labelField.setOnClickListener(view -> clearPlaceholderText());
         labelField.setOnFocusChangeListener((view, l) -> clearPlaceholderText());
 
-        Button saveIdentityButton = findViewById(R.id.saveIdentityButton);
+        Button saveIdentityButton = findViewById(R.id.addSelectedButton);
         saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
     }
 
@@ -207,7 +206,7 @@ public class AddIdentityActivity extends AppCompatActivity
         else
         {
             FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identity);
-            cleanupUncategorizedIds();
+            cleanupUnclassifiedIds();
             FaceDatabaseStorage.storeToInternalStorage();
 
             showSnackBar(R.string.info_add_success);
@@ -278,7 +277,7 @@ public class AddIdentityActivity extends AppCompatActivity
                 "Select video from gallery",
                 "Capture photo from camera",
                 "Capture video from camera",
-                "Select from uncategorized"
+                "Select from unclassified"
         };
         pictureDialog.setItems(pictureDialogItems,
                 (dialog, which) ->
@@ -297,7 +296,7 @@ public class AddIdentityActivity extends AppCompatActivity
                             takeVideoFromCamera();
                             break;
                         case 4:
-                            choosePhotosFromUncategorized();
+                            choosePhotosFromUnclassified();
                             break;
                     }
                 });
@@ -373,10 +372,10 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
-    private void choosePhotosFromUncategorized()
+    private void choosePhotosFromUnclassified()
     {
-        Intent intent = new Intent(AddIdentityActivity.this, AddUnknownIdentityActivity.class);
-        startActivityForResult(intent, PICK_IMAGE_MULTIPLE_UNCATEGORIZED);
+        Intent intent = new Intent(AddIdentityActivity.this, SelectFromUnclassifiedActivity.class);
+        startActivityForResult(intent, PICK_IMAGE_MULTIPLE_UNCLASSIFIED);
     }
 
     @Override
@@ -399,9 +398,9 @@ public class AddIdentityActivity extends AppCompatActivity
             {
                 processImages(data);
             }
-            else if (requestCode == PICK_IMAGE_MULTIPLE_UNCATEGORIZED && data != null)
+            else if (requestCode == PICK_IMAGE_MULTIPLE_UNCLASSIFIED && data != null)
             {
-                processUncategorizedImages(data);
+                processUnclassifiedImages(data);
             }
             else if ( (requestCode == SHOOT_VIDEO || requestCode == PICK_VIDEO) && data != null)
             {
@@ -410,33 +409,33 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
-    private void processUncategorizedImages(Intent data)
+    private void processUnclassifiedImages(Intent data)
     {
         int[] ids = data.getIntArrayExtra("selectedIDs");
         if(ids.length < 1)
             return;
 
-        Map<Integer, FaceData> uncategorizedData = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
+        Map<Integer, FaceData> unclassifiedFaces = FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces;
         for (int id : ids)
         {
-            if(uncategorizedIdsToRemoveOnCommit.contains(id))
+            if(unclassifiedIdsToRemoveOnCommit.contains(id))
                 continue;
 
-            FaceData faceData = uncategorizedData.get(id);
+            FaceData faceData = unclassifiedFaces.get(id);
             faceDataset.add(faceData);
             faceDataAdapter.notifyDataSetChanged();
 
             //delayed cleanup
-            uncategorizedIdsToRemoveOnCommit.add(id);
+            unclassifiedIdsToRemoveOnCommit.add(id);
         }
     }
 
-    private void cleanupUncategorizedIds()
+    private void cleanupUnclassifiedIds()
     {
-        Map<Integer, FaceData> uncategorizedData = FaceDatabaseStorage.getFaceDatabase().uncategorizedData;
-        for (Integer id : uncategorizedIdsToRemoveOnCommit)
-            uncategorizedData.remove(id);
-        uncategorizedIdsToRemoveOnCommit.clear();
+        Map<Integer, FaceData> unclassifiedFaces = FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces;
+        for (Integer id : unclassifiedIdsToRemoveOnCommit)
+            unclassifiedFaces.remove(id);
+        unclassifiedIdsToRemoveOnCommit.clear();
     }
 
     private void processImages(Intent data)

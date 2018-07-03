@@ -111,7 +111,7 @@ public class FaceDetectionExecutor {
             if (!predictedClass.isClassified())
             {
                 FaceDatabase db = FaceDatabaseStorage.getFaceDatabase();
-                db.uncategorizedData.put(db.nextMapId.incrementAndGet(), predictedClass.getFaceData());
+                db.unclassifiedFaces.put(db.nextMapId.incrementAndGet(), predictedClass.getFaceData());
                 databaseChanged = true;
             }
         }

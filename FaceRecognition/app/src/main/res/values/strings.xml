@@ -16,13 +16,14 @@
     <string name="title_activity_camera2_face_recognition">Camera2FaceRecognition</string>
     <string name="clearDatabase">Clear database</string>
     <string name="addSamplesButtonText">Add</string>
-    <string name="saveIdentityButtonText">Save</string>
-    <string name="clearFormButtonText">Clear</string>
+    <string name="unselectAllButtonText">Unselect all</string>
+    <string name="selectAllButtonText">Select all</string>
+    <string name="addSelectedButtonText">Add</string>
     <string name="AuthorizedText">Authorized</string>
     <string name="NonAuthorizedText">Not authorized</string>
     <string name="face_sample_description">Face sample</string>
     <string name="add_new_identity_toolbar">Add New Identity</string>
-    <string name="create_identity_from_unknown_faces">Add Identity From Unknown Faces</string>
-    <string name="title_activity_add_unknown_identity">AddUnknownIdentityActivity</string>
+    <string name="select_from_unclassified_faces">Select from unclassified</string>
+    <string name="title_activity_select_from_unclassified">SelectFromUnclassifiedActivity</string>
 
 </resources>

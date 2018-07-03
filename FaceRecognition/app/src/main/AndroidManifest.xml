@@ -48,8 +48,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddUnknownIdentityActivity"
-            android:label="@string/title_activity_add_unknown_identity"
+            android:name=".SelectFromUnclassifiedActivity"
+            android:label="@string/title_activity_select_from_unclassified"
             android:theme="@style/AppTheme.NoActionBar">
             <!--
             <intent-filter>

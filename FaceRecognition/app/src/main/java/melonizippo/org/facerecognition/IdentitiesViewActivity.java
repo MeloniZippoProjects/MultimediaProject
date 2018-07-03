@@ -209,7 +209,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
                 .append(", photos: ").append(ie.identityDataset.size())
                 .append("\n");
         }
-        text.append("Uncategorized samples: ").append(db.uncategorizedData.size());
+        text.append("Unclassified samples: ").append(db.unclassifiedFaces.size());
         textView.setText(text.toString());
     }
 }

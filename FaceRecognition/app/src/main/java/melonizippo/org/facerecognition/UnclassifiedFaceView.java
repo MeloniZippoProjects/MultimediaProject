@@ -10,15 +10,15 @@ import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-public class UncategorizedFaceView extends FrameLayout implements Checkable
+public class UnclassifiedFaceView extends FrameLayout implements Checkable
 {
     ImageView faceView;
     boolean isSelected;
 
-    public UncategorizedFaceView(@NonNull Context context)
+    public UnclassifiedFaceView(@NonNull Context context)
     {
         super(context);
-        LayoutInflater.from(context).inflate(R.layout.view_uncategorized_face, this);
+        LayoutInflater.from(context).inflate(R.layout.view_unclassified_face, this);
         faceView = (ImageView) getRootView().findViewById(R.id.faceView);
     }
 

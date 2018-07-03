@@ -35,8 +35,8 @@ public class KNNClassifier {
 			}
 		}
 
-		//check in uncategorized data
-		for(FaceData faceData : faceDatabase.uncategorizedData.values())
+		//check in unclassified data
+		for(FaceData faceData : faceDatabase.unclassifiedFaces.values())
 		{
 			LabeledFaceData labeledFaceData = new LabeledFaceData(faceData, null);
 			double similarity = labeledFaceData.getSimilarity(queryFaceData);
