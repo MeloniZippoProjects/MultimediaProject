@@ -18,9 +18,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -62,7 +64,7 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
 
-
+    Thread workerThread;
 
     private boolean isDefaultLabel = true;
 
@@ -77,6 +79,8 @@ public class AddIdentityActivity extends AppCompatActivity
     private KNNClassifier knnClassifier;
 
     private TextInputEditText labelField;
+    ProgressBar progressBar;
+
 
     private static final String LABEL_TEXT_KEY = "identity_label_text";
     private static final String DATASET_KEY = "face_dataset";
@@ -95,6 +99,7 @@ public class AddIdentityActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         labelField = findViewById(R.id.identityLabelField);
+        progressBar = findViewById(R.id.progressBar);
 
         //Load saved state
         if(savedInstanceState != null)
@@ -143,7 +148,16 @@ public class AddIdentityActivity extends AppCompatActivity
         saveIdentityButton.setOnClickListener(view -> commitAddIdentity());
     }
 
-    private void saveFaceDataset() {
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if(workerThread != null && workerThread.isAlive())
+            workerThread.interrupt();
+    }
+
+    private void saveFaceDataset()
+    {
         try(FileOutputStream fileOutputStream = new FileOutputStream(faceDatasetFile))
         {
             try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream))
@@ -157,7 +171,8 @@ public class AddIdentityActivity extends AppCompatActivity
         }
     }
 
-    private void restoreFaceDataset() {
+    private void restoreFaceDataset()
+    {
         try(FileInputStream fileInputStream = new FileInputStream(faceDatasetFile))
         {
             try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream))
@@ -198,6 +213,12 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void commitAddIdentity()
     {
+        if(workerThread != null && workerThread.isAlive())
+        {
+            showSnackBar("Adding samples, please wait...");
+            return;
+        }
+
         Identity identity = new Identity();
         identity.label = ((TextInputEditText)findViewById(R.id.identityLabelField)).getText().toString().trim();
         identity.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
@@ -242,11 +263,7 @@ public class AddIdentityActivity extends AppCompatActivity
         {
             Resources res = getResources();
             String errorMessage = getString(R.string.error_not_enough_samples, Parameters.MIN_IDENTITY_SAMPLES);
-            Snackbar errorBar = Snackbar.make(
-                    findViewById(R.id.addIdentityCoordinatorLayout),
-                    errorMessage,
-                    Snackbar.LENGTH_SHORT);
-            errorBar.show();
+            showSnackBar(errorMessage);
             return false;
         }
 
@@ -274,10 +291,18 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private void clearForm()
     {
+        if(workerThread != null && workerThread.isAlive())
+        {
+            workerThread.interrupt();
+            try{workerThread.join();}
+            catch (InterruptedException ex){}
+        }
+
         labelField.getText().clear();
         faceDataset.clear();
         faceDataAdapter.notifyDataSetChanged();
         unclassifiedIdsToRemoveOnCommit.clear();
+        progressBar.setVisibility(View.GONE);
 
         Log.i(TAG, "Form cleared");
     }
@@ -291,8 +316,23 @@ public class AddIdentityActivity extends AppCompatActivity
         errorBar.show();
     }
 
+    private void showSnackBar(String string)
+    {
+        Snackbar errorBar = Snackbar.make(
+                findViewById(R.id.addIdentityCoordinatorLayout),
+                string,
+                Snackbar.LENGTH_SHORT);
+        errorBar.show();
+    }
+
     private void showPictureDialog()
     {
+        if(workerThread != null && workerThread.isAlive())
+        {
+            showSnackBar("Already adding samples, please wait...");
+            return;
+        }
+
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
@@ -481,33 +521,75 @@ public class AddIdentityActivity extends AppCompatActivity
         {
             if (data.getClipData() != null)
             {
-                ClipData clipData = data.getClipData();
-                int itemCount = clipData.getItemCount();
-                for (int i = 0; i < itemCount; i++)
+                progressBar.setProgress(0);
+                progressBar.setVisibility(View.VISIBLE);
+
+                workerThread = new Thread(() ->
                 {
-                    Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
-                    ClipData.Item item = clipData.getItemAt(i);
-                    Uri imageUri = item.getUri();
-                    addImage(imageUri);
-                }
+                    ClipData clipData = data.getClipData();
+                    int itemCount = clipData.getItemCount();
+                    int progressStep = Math.floorDiv(100, itemCount);
+                    for (int i = 0; i < itemCount; i++)
+                    {
+                        if(Thread.interrupted())
+                        {
+                            Log.i(TAG, "Worker thread interrupted, aborting");
+                            return;
+                        }
+
+                        Log.i(TAG, "Processing " + (i + 1) + " out of " + itemCount);
+                        ClipData.Item item = clipData.getItemAt(i);
+                        Uri imageUri = item.getUri();
+                        addImage(imageUri);
+                        runOnUiThread(() -> progressBar.incrementProgressBy(progressStep));
+                    }
+                    runOnUiThread(() ->
+                    {
+                        progressBar.setProgress(100);
+                        progressBar.setVisibility(View.GONE);
+                    });
+                });
+                workerThread.start();
             }
         }
     }
 
     private void processVideo(Intent data)
     {
-        Uri videoUri = data.getData();
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(this, videoUri);
-        String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        long duration = Long.parseLong(durationString) * 1000;
-        long step = duration / (Parameters.VIDEO_FRAMES_TO_EXTRACT + 1);
+        progressBar.setProgress(0);
+        progressBar.setVisibility(View.VISIBLE);
 
-        for(long time = step; time < duration; time += step)
+        workerThread = new Thread(() ->
         {
-            Bitmap frame = retriever.getFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST);
-            addImage(frame);
-        }
+            Uri videoUri = data.getData();
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(this, videoUri);
+            String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            long duration = Long.parseLong(durationString) * 1000;
+            long step = duration / (Parameters.VIDEO_FRAMES_TO_EXTRACT + 1);
+
+            int progressStep = (int) Math.floorDiv(100, Parameters.VIDEO_FRAMES_TO_EXTRACT);
+
+            for(long time = step; time < duration; time += step)
+            {
+                if(Thread.interrupted())
+                {
+                    Log.i(TAG, "Worker thread interrupted, aborting");
+                    return;
+                }
+
+                Log.i(TAG, "Processing frame at " + time + " out of " + duration);
+                Bitmap frame = retriever.getFrameAtTime(time, MediaMetadataRetriever.OPTION_CLOSEST);
+                addImage(frame);
+                runOnUiThread(() -> progressBar.incrementProgressBy(progressStep));
+            }
+            runOnUiThread(() ->
+            {
+                progressBar.setProgress(100);
+                progressBar.setVisibility(View.GONE);
+            });
+        });
+        workerThread.start();
     }
 
     private void addImage(Uri imageUri)
@@ -567,7 +649,7 @@ public class AddIdentityActivity extends AppCompatActivity
         fd.setFeatures(extractor.extract(fd.getFaceMat()));
 
         faceDataset.add(fd);
-        faceDataAdapter.notifyDataSetChanged();
+        runOnUiThread(() -> faceDataAdapter.notifyDataSetChanged());
     }
 
     private static Bitmap scaleBitmap(Bitmap tmpBitmap) {
