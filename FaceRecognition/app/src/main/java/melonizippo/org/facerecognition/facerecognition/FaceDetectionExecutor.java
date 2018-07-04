@@ -43,10 +43,13 @@ public class FaceDetectionExecutor {
     }
 
     private static Mat faceMat = new Mat();
-    public boolean classifyFaces(Mat frameMat, MatOfRect faces)
+    private static Mat frameMat = new Mat();
+    public boolean classifyFaces(Mat inputFrameMat, MatOfRect faces)
     {
         if(!classifying.tryAcquire())
             return false;
+
+        inputFrameMat.copyTo(frameMat);
 
         Runnable task = () -> {
             try
