@@ -31,5 +31,7 @@
     <string name="add_new_identity_toolbar">Add New Identity</string>
     <string name="select_from_unclassified_faces">Select from unclassified</string>
     <string name="title_activity_select_from_unclassified">SelectFromUnclassifiedActivity</string>
+    <string name="navigation_drawer_open">navigation_drawer_open</string>
+    <string name="navigation_drawer_close">navigation_drawer_close</string>
 
 </resources>

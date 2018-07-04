@@ -14,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -58,9 +59,12 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
 
         //Setup list view
         identityEntryAdapter = new IdentityEntryAdapter(identitiesList, getApplicationContext());
