@@ -22,6 +22,7 @@ public class FaceDatabase implements Serializable
         {
             sum += identity.identityDataset.size();
         }
+        sum += unclassifiedFaces.size();
         return sum;
     }
 }
