@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 

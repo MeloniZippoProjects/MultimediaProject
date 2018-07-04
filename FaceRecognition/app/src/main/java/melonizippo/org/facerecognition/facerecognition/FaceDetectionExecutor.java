@@ -20,12 +20,12 @@ import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.deep.Parameters;
+import melonizippo.org.facerecognition.Parameters;
 
 public class FaceDetectionExecutor {
 
     private ExecutorService classificationService = Executors.newSingleThreadExecutor();
-    private ExecutorService logAndStoreService = Executors.newSingleThreadExecutor();
+    private ExecutorService unclassifiedFacesStorageService = Executors.newSingleThreadExecutor();
 
     private DNNExtractor extractor;
     private KNNClassifier knnClassifier;
@@ -81,7 +81,7 @@ public class FaceDetectionExecutor {
                     }
                 }
 
-                logAndStoreService.submit(
+                unclassifiedFacesStorageService.submit(
                         () -> storeUnclassifiedFaces(unclassifiedFaces));
 
                 if (enoughSamplesInDb)

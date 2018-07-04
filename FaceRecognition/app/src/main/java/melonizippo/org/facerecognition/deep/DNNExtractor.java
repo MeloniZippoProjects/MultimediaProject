@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.dnn.Net;
 import org.opencv.imgproc.Imgproc;
+
+import melonizippo.org.facerecognition.Parameters;
 
 public class DNNExtractor {
 
@@ -25,9 +25,6 @@ public class DNNExtractor {
 	{
 		net = readNetFromCaffe(protoTxt.getPath(), caffeModel.getPath());
 	}
-
-    //todo: verify correctness of this implementation porting
-
 
 	private Mat converted = new Mat();
     public float[] extract(Mat img)
@@ -70,12 +67,6 @@ public class DNNExtractor {
 		for(int i = 0; i < features.length; ++i)
 		{
 			normalizedVector[i] = features[i]/norm;
-		}
-
-		norm = 0;
-		for(float elem : normalizedVector)
-		{
-			norm += elem*elem;
 		}
 
 		return normalizedVector;

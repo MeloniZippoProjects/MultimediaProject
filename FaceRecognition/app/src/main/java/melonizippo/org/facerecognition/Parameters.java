@@ -1,21 +1,9 @@
-package melonizippo.org.facerecognition.deep;
+package melonizippo.org.facerecognition;
 
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 
 public class Parameters {
-	
-	//DEEP parameters for lightened
-
-	/*
-	public static final String DEEP_LAYER = "fc1";
-
-	public static final int IMG_WIDTH = 128;
-	public static final int IMG_HEIGHT = 128;
-
-	public static final Scalar MEAN = new Scalar(0);
-	*/
-
 
 	//DEEP parameters for resnet50
 
@@ -41,13 +29,11 @@ public class Parameters {
 	//k-Nearest Neighbors
 	public static final int K = 11;
 	public static final double MIN_CONFIDENCE = 0.6;
+	public static final int MIN_IDENTITY_SAMPLES = 10;
 	
-	//Face Detection Parameters
-
-	public static final float KNN_CONF_THRESHOLD = 0.6f;
+	//Misc Parameters
 
 	public static final int MAX_DIMENSION = 1349;
 	public static final long GC_INTERVAL = 60;
-	public static final int MIN_IDENTITY_SAMPLES = 10;
 	public static final long VIDEO_FRAMES_TO_EXTRACT = MIN_IDENTITY_SAMPLES * 2;
 }

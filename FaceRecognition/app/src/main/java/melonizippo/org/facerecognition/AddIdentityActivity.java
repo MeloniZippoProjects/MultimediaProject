@@ -47,7 +47,6 @@ import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.Identity;
 import melonizippo.org.facerecognition.deep.DNNExtractor;
-import melonizippo.org.facerecognition.deep.Parameters;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
 import melonizippo.org.facerecognition.facerecognition.KNNClassifier;
 
@@ -62,8 +61,6 @@ public class AddIdentityActivity extends AppCompatActivity
     private static final int SHOOT_VIDEO = 5;
     private static final int PICK_IMAGE_MULTIPLE_UNCLASSIFIED = 6;
 
-    private static final int MAX_DIMENSION = Parameters.MAX_DIMENSION;
-
     Thread workerThread;
 
     private boolean isDefaultLabel = true;
@@ -76,7 +73,6 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private FaceDetector faceDetector;
     private DNNExtractor extractor;
-    private KNNClassifier knnClassifier;
 
     private TextInputEditText labelField;
     ProgressBar progressBar;
@@ -127,7 +123,6 @@ public class AddIdentityActivity extends AppCompatActivity
         FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
         faceDetector = app.faceDetector;
         extractor = app.extractor;
-        knnClassifier = app.knnClassifier;
 
         //Setup grid view
         faceDataAdapter = new FaceDataAdapter(faceDataset, getApplicationContext());
@@ -224,10 +219,7 @@ public class AddIdentityActivity extends AppCompatActivity
         identity.authorized = !((CheckBox)findViewById(R.id.sendAlertCheckbox)).isChecked();
         identity.identityDataset = new ArrayList<>(faceDataset);
 
-        if(!validateIdentity(identity))
-            return;
-        else
-        {
+        if (validateIdentity(identity)) {
             FaceDatabaseStorage.getFaceDatabase().knownIdentities.add(identity);
             cleanupUnclassifiedIds();
             FaceDatabaseStorage.storeToInternalStorage();
@@ -261,7 +253,6 @@ public class AddIdentityActivity extends AppCompatActivity
         int datasetCount = identity.identityDataset.size();
         if(datasetCount < Parameters.MIN_IDENTITY_SAMPLES)
         {
-            Resources res = getResources();
             String errorMessage = getString(R.string.error_not_enough_samples, Parameters.MIN_IDENTITY_SAMPLES);
             showSnackBar(errorMessage);
             return false;
@@ -276,17 +267,15 @@ public class AddIdentityActivity extends AppCompatActivity
                 .setTitle("Name already used")
                 .setMessage("Do you want to add the samples to the same identity?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        dbIdentity.identityDataset.addAll(identity.identityDataset);
-                        dbIdentity.filterDuplicatesFromDataset();
-                        cleanupUnclassifiedIds();
-                        FaceDatabaseStorage.storeToInternalStorage();
+                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                    dbIdentity.identityDataset.addAll(identity.identityDataset);
+                    dbIdentity.filterDuplicatesFromDataset();
+                    cleanupUnclassifiedIds();
+                    FaceDatabaseStorage.storeToInternalStorage();
 
-                        showSnackBar(R.string.info_edit_success);
-                        clearForm();
-                    }})
+                    showSnackBar(R.string.info_edit_success);
+                    clearForm();
+                })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
@@ -296,7 +285,7 @@ public class AddIdentityActivity extends AppCompatActivity
         {
             workerThread.interrupt();
             try{workerThread.join();}
-            catch (InterruptedException ex){}
+            catch (InterruptedException ignored){}
         }
 
         labelField.getText().clear();
@@ -622,23 +611,10 @@ public class AddIdentityActivity extends AppCompatActivity
         MatOfRect facesMat = faceDetector.detect(imageMat);
         Rect[] faces = facesMat.toArray();
 
-        //bug: for some reason, it's always more than 1 face
-        //if(faces.length != 1)
-        if(false)
-        {
-            //todo: show that kind of notification on black background, bottom side of the screen, which disappears after a while
-
-            Log.i(TAG, "Detected more than one face");
-            return;
-        }
-
         if(faces.length < 1)
         {
-            //todo: show that kind of notification on black background, bottom side of the screen, which disappears after a while
-
             Log.i(TAG, "No face detected");
             return;
-
         }
 
         Log.i(TAG, "Face detected, adding to dataset");
@@ -655,21 +631,21 @@ public class AddIdentityActivity extends AppCompatActivity
 
     private static Bitmap scaleBitmap(Bitmap tmpBitmap) {
         Bitmap imageBitmap;
-        if(tmpBitmap.getWidth() > MAX_DIMENSION || tmpBitmap.getHeight() > MAX_DIMENSION)
+        if(tmpBitmap.getWidth() > Parameters.MAX_DIMENSION || tmpBitmap.getHeight() > Parameters.MAX_DIMENSION)
         {
             double factor;
             int dstWidth;
             int dstHeight;
             if(tmpBitmap.getWidth() >= tmpBitmap.getHeight())
             {
-                factor = MAX_DIMENSION / (double) tmpBitmap.getWidth();
-                dstWidth = MAX_DIMENSION;
+                factor = Parameters.MAX_DIMENSION / (double) tmpBitmap.getWidth();
+                dstWidth = Parameters.MAX_DIMENSION;
                 dstHeight = (int)(tmpBitmap.getHeight() * factor);
             }
             else
             {
-                factor = MAX_DIMENSION / (double) tmpBitmap.getHeight();
-                dstHeight = MAX_DIMENSION;
+                factor = Parameters.MAX_DIMENSION / (double) tmpBitmap.getHeight();
+                dstHeight = Parameters.MAX_DIMENSION;
                 dstWidth = (int)(tmpBitmap.getWidth() * factor);
             }
 

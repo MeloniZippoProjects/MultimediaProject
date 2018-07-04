@@ -5,7 +5,7 @@ import melonizippo.org.facerecognition.database.FaceDatabase;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
 import melonizippo.org.facerecognition.database.Identity;
 import melonizippo.org.facerecognition.database.LabeledFaceData;
-import melonizippo.org.facerecognition.deep.Parameters;
+import melonizippo.org.facerecognition.Parameters;
 
 import java.util.*;
 
@@ -44,58 +44,58 @@ public class KNNClassifier {
 
 		//take first K
 		List<Map.Entry<Double,LabeledFaceData>> nearestNeighbours = new LinkedList<>();
-		int k = Parameters.K;
+
 		for(Map.Entry<Double,LabeledFaceData> faceData : sortedFaceData.descendingMap().entrySet())
 		{
-			if(nearestNeighbours.size() < k)
+			if(nearestNeighbours.size() < Parameters.K)
 				nearestNeighbours.add(faceData);
 			else
 				break;
 		}
 
-        PredictedClass predictedClass = getBestClass(nearestNeighbours);
-		predictedClass.setFaceData(queryFaceData);
+		PredictedClass predictedClass = getBestClass(nearestNeighbours);
 
-        double minConfidence = Parameters.MIN_CONFIDENCE;
-        if(predictedClass.getConfidence() >= minConfidence)
+        if(predictedClass.getConfidence() >= Parameters.MIN_CONFIDENCE)
         {
             return predictedClass;
         }
         else
         {
-            return new PredictedClass(null, predictedClass.getConfidence(), queryFaceData);
+            return new PredictedClass(null, predictedClass.getConfidence());
         }
 	}
 
-
-	//todo: refactor "label" names to "identity" ones
-	private PredictedClass getBestClass(List<Map.Entry<Double,LabeledFaceData>> results)
+	private PredictedClass getBestClass(List<Map.Entry<Double,LabeledFaceData>> kNearestNeighbours)
     {
 		//Loop in the results list and retrieve the best label
 
-		HashMap<Identity, Double> identityScores = new HashMap<>();
-		HashMap<Identity, Double> bestIdentityScore = new HashMap<>();
 
-		for(Map.Entry<Double,LabeledFaceData> descriptor : results)
+		//Total accumulated score for each identity
+		HashMap<Identity, Double> identityTotalScores = new HashMap<>();
+
+		//Best score so far for each identity
+		HashMap<Identity, Double> identityBestScores = new HashMap<>();
+
+		for(Map.Entry<Double,LabeledFaceData> descriptor : kNearestNeighbours)
 		{
 			Identity identityLabel = descriptor.getValue().getIdentityLabel();
-			Double currentIdentityScore = identityScores.getOrDefault(identityLabel, 0d);
-			identityScores.put(identityLabel, currentIdentityScore + descriptor.getKey());
+			Double currentIdentityTotalScore = identityTotalScores.getOrDefault(identityLabel, 0d);
+			identityTotalScores.put(identityLabel, currentIdentityTotalScore + descriptor.getKey());
 
-			Double currentBestIdentityScore = bestIdentityScore.getOrDefault(identityLabel, 0d);
+			Double currentBestIdentityScore = identityBestScores.getOrDefault(identityLabel, 0d);
 			if(descriptor.getKey() > currentBestIdentityScore)
-				bestIdentityScore.put(identityLabel, descriptor.getKey());
+				identityBestScores.put(identityLabel, descriptor.getKey());
 		}
 
-		Optional<Map.Entry<Identity,Double>> bestIdentityLabel =
-                identityScores.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue));
+		Optional<Map.Entry<Identity,Double>> bestIdentityLabelOptional =
+                identityTotalScores.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue));
 
-		if(bestIdentityLabel.isPresent())
+		if(bestIdentityLabelOptional.isPresent())
 		{
-			Identity bestLabel = bestIdentityLabel.get().getKey();
-			Double confidence = bestIdentityScore.get(bestLabel);
+			Identity bestIdentityLabel = bestIdentityLabelOptional.get().getKey();
+			Double confidence = identityBestScores.get(bestIdentityLabel);
 
-			return new PredictedClass(bestLabel, confidence, null);
+			return new PredictedClass(bestIdentityLabel, confidence);
 		}
 		else
 		    throw new IllegalStateException("Best label should exist");

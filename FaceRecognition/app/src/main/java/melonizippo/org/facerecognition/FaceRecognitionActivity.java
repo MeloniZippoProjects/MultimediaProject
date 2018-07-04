@@ -201,24 +201,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         public void onOpened(@NonNull CameraDevice camera) {
             currentCameraDevice = camera;
             try {
-                CameraCharacteristics characteristics
-                        = cameraManager.getCameraCharacteristics(currentCameraId);
-                StreamConfigurationMap map = characteristics.get(
-                        CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-
-                if(map == null)
-                {
-                    Log.e(TAG, "Configuration map is null");
-                    return;
-                }
-
-                Size[] sizes = map.getOutputSizes(ImageReader.class);
-
                 imageReader = ImageReader.newInstance(surfaceView.getHeight()/2, surfaceView.getWidth()/2, ImageFormat.JPEG, 5);
                 imageReader.setOnImageAvailableListener(imageAvailableListener, null);
                 createCaptureSession();
-
-                return;
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
