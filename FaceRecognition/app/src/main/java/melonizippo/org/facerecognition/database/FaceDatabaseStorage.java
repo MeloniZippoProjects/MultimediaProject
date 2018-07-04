@@ -78,7 +78,7 @@ public class FaceDatabaseStorage
 
     public static void clear()
     {
-        faceDatabase = new FaceDatabase();
+        faceDatabase.clear();
         Log.i(TAG, "Database reset");
         storeToInternalStorage();
     }

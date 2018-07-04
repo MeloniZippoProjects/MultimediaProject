@@ -25,4 +25,11 @@ public class FaceDatabase implements Serializable
         sum += unclassifiedFaces.size();
         return sum;
     }
+
+    public void clear()
+    {
+        knownIdentities.clear();
+        unclassifiedFaces.clear();
+        nextMapId.set(0);
+    }
 }
