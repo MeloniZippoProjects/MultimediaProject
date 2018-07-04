@@ -14,7 +14,7 @@
     <string name="error_not_enough_samples">Not enough samples! Need at least %1$d </string>
     <string name="importTitle">Import database</string>
     <string name="exportTitle">Export database</string>
-    <string name="title_activity_camera2_face_recognition">Camera2FaceRecognition</string>
+    <string name="title_activity_camera2_face_recognition">Face recognition</string>
     <string name="clearDatabase">Clear database</string>
 
     <string name="clearFormButtonText">Clear form</string>
@@ -28,9 +28,7 @@
     <string name="AuthorizedText">Authorized</string>
     <string name="NonAuthorizedText">Not authorized</string>
     <string name="face_sample_description">Face sample</string>
-    <string name="add_new_identity_toolbar">Add New Identity</string>
-    <string name="select_from_unclassified_faces">Select from unclassified</string>
-    <string name="title_activity_select_from_unclassified">SelectFromUnclassifiedActivity</string>
+    <string name="title_activity_select_from_unclassified">Select from unclassified</string>
     <string name="navigation_drawer_open">navigation_drawer_open</string>
     <string name="navigation_drawer_close">navigation_drawer_close</string>
 

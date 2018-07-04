@@ -21,12 +21,6 @@
             android:background="?android:attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_new_identity_toolbar"
-                android:textSize="22sp"
-                android:textStyle="bold"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
