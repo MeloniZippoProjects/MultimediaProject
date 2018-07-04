@@ -60,7 +60,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_save);
+        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         //Setup list view
         identityEntryAdapter = new IdentityEntryAdapter(identitiesList, getApplicationContext());
