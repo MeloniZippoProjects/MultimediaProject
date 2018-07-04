@@ -44,7 +44,7 @@
             android:verticalSpacing="5dp"
             android:gravity="center"
 
-            android:numColumns="auto_fit"
+            android:numColumns="3"
         />
 
         <ProgressBar
