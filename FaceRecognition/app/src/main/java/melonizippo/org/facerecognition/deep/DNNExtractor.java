@@ -17,9 +17,6 @@ import org.opencv.imgproc.Imgproc;
 public class DNNExtractor {
 
 	private Net net;
-	private Size imgSize;
-	private Scalar mean;
-	private String layer;
 	
 	public DNNExtractor(
 		File protoTxt,
@@ -27,9 +24,6 @@ public class DNNExtractor {
 	)
 	{
 		net = readNetFromCaffe(protoTxt.getPath(), caffeModel.getPath());
-        imgSize = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
-		mean = Parameters.MEAN;
-		layer = Parameters.DEEP_LAYER;
 	}
 
     //todo: verify correctness of this implementation porting
@@ -38,22 +32,15 @@ public class DNNExtractor {
 	private Mat converted = new Mat();
     public float[] extract(Mat img)
 	{
-		//temp workaround to avoid runtime crashes
-		//return new float[]{0.0f, 1.1f, 3.5f};
-
-		//when using resnet the mat must be bgr
+		//when using resnet the mat must be rgb
 		Imgproc.cvtColor(img, converted, Imgproc.COLOR_RGBA2RGB);
-		converted.copyTo(img);
 
-		//when using lightened the mat can be rgba (or bgra?)
-		//img.copyTo(converted);
-
-		Mat inputBlob = blobFromImage(converted, 1.0, imgSize, mean, false, false); // Convert Mat to dnn::Blob image batch
+		Mat inputBlob = blobFromImage(converted, 1.0, Parameters.IMG_SIZE, Parameters.MEAN, false, false); // Convert Mat to dnn::Blob image batch
 
 		net.setInput(inputBlob); // set the network input
 
 		List<Mat> outputBlobs = new ArrayList<>();
-		net.forward(outputBlobs, layer); // compute output
+		net.forward(outputBlobs, Parameters.DEEP_LAYER); // compute output
 
 		Mat prob = outputBlobs.get(0);
 

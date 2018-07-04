@@ -23,8 +23,10 @@ public class Parameters {
 
 	public static final Scalar MEAN = new Scalar(91.4953, 103.8827, 131.0912);
 
-	public static final int IMG_WIDTH = 224;
-	public static final int IMG_HEIGHT = 224;
+	private static final int IMG_WIDTH = 224;
+	private static final int IMG_HEIGHT = 224;
+
+	public static final Size IMG_SIZE = new Size(Parameters.IMG_WIDTH, Parameters.IMG_HEIGHT);
 
 
 	//Parameters for face detector
