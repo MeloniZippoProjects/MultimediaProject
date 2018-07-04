@@ -115,12 +115,14 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
                 break;
         }
 
-        if(result)
-            Snackbar.make(findViewById(R.id.identitiesView), "Operation completed", Snackbar.LENGTH_SHORT);
-        else
-            Snackbar.make(findViewById(R.id.identitiesView), "Operation failed", Snackbar.LENGTH_SHORT);
-
         drawerLayout.closeDrawer(GravityCompat.START);
+        Snackbar resultSnackbar;
+        if(result)
+            resultSnackbar = Snackbar.make(findViewById(R.id.identitiesView), "Operation completed", Snackbar.LENGTH_SHORT);
+        else
+            resultSnackbar = Snackbar.make(findViewById(R.id.identitiesView), "Operation failed", Snackbar.LENGTH_SHORT);
+
+        resultSnackbar.show();
         return true;
     }
 
@@ -204,6 +206,7 @@ public class IdentitiesViewActivity extends AppCompatActivity implements Navigat
         }
 
         updateText();
+        updateView();
         return true;
     }
 
