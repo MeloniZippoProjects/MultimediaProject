@@ -77,7 +77,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     public FaceDetector faceDetector;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
 
@@ -105,7 +106,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         //graphic settings
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
         identitiesEditor.setOnClickListener(view -> {
@@ -145,8 +145,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         Log.d(TAG, "on pause");
         if(canvas != null)
             surfaceHolder.unlockCanvasAndPost(canvas);
-        imageReader.close();
-        cameraCaptureSession.close();
+        if(imageReader != null)
+                imageReader.close();
+        if(cameraCaptureSession != null)
+            cameraCaptureSession.close();
     }
 
     @Override
@@ -314,12 +316,15 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
     public void openCamera(String cameraId) {
         currentCameraId = cameraId;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(
+                    this,
                     new String[]{Manifest.permission.CAMERA},
                     PERMISSION_CAMERA);
             return;
         }
+
         try {
             cameraManager.openCamera(currentCameraId, cameraCallback, null);
         } catch (CameraAccessException e) {
