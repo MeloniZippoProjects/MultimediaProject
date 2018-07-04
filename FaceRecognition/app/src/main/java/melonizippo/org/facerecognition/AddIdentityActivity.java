@@ -280,6 +280,7 @@ public class AddIdentityActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int whichButton)
                     {
                         dbIdentity.identityDataset.addAll(identity.identityDataset);
+                        dbIdentity.filterDuplicatesFromDataset();
                         cleanupUnclassifiedIds();
                         FaceDatabaseStorage.storeToInternalStorage();
 
