@@ -1,4 +1,4 @@
-package melonizippo.org.facerecognition.streaming;
+package melonizippo.org.facerecognition;
 
 import android.Manifest;
 import android.content.Intent;
@@ -41,13 +41,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import melonizippo.org.facerecognition.FaceRecognitionApp;
-import melonizippo.org.facerecognition.IdentitiesViewActivity;
-import melonizippo.org.facerecognition.R;
 import melonizippo.org.facerecognition.facerecognition.FaceDetectionExecutor;
 import melonizippo.org.facerecognition.facerecognition.FaceDetector;
+import melonizippo.org.facerecognition.streaming.AutoFitSurfaceView;
 
-public class Camera2FaceRecognition extends AppCompatActivity {
+public class FaceRecognitionActivity extends AppCompatActivity {
 
     public static final String TAG = "Camera2 Face Recognition";
 
@@ -81,7 +79,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera2_face_recognition);
+        setContentView(R.layout.activity_face_recognition);
 
         FaceRecognitionApp app = (FaceRecognitionApp) getApplication();
         faceDetector = app.faceDetector;
@@ -111,7 +109,7 @@ public class Camera2FaceRecognition extends AppCompatActivity {
 
         FloatingActionButton identitiesEditor = findViewById(R.id.goToIdentitiesEditor);
         identitiesEditor.setOnClickListener(view -> {
-            Intent intent = new Intent(Camera2FaceRecognition.this, IdentitiesViewActivity.class);
+            Intent intent = new Intent(FaceRecognitionActivity.this, IdentitiesViewActivity.class);
             startActivity(intent);
         });
 

@@ -38,7 +38,7 @@
             android:label="@string/title_activity_add_identity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".streaming.Camera2FaceRecognition"
+            android:name=".FaceRecognitionActivity"
             android:label="@string/title_activity_camera2_face_recognition"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>

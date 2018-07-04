@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".streaming.Camera2FaceRecognition"
-    tools:showIn="@layout/activity_camera2_face_recognition">
+    tools:context=".FaceRecognitionActivity"
+    tools:showIn="@layout/activity_face_recognition">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,8 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text=""/>
-
+            android:text=""
+        />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
