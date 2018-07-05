@@ -8,10 +8,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.apache.commons.math3.exception.DimensionMismatchException;
+import org.apache.commons.math3.ml.clustering.Clusterable;
+import org.apache.commons.math3.ml.distance.DistanceMeasure;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
-public class FaceData implements Serializable
+public class FaceData implements Serializable, Clusterable
 {
     protected Mat faceMat = new Mat();
     protected float[] features;
@@ -69,11 +72,43 @@ public class FaceData implements Serializable
     public double getSimilarity(@NonNull FaceData queryData)
     {
         float[] queryVector = queryData.getFeatures();
+
+        return scalarProduct(queryVector, getFeatures());
+    }
+
+    private static double scalarProduct(float[] a, float[] b)
+    {
         double scalarProduct = 0;
 
-        for(int i = 0; i < queryVector.length; ++i)
-            scalarProduct += getFeatures()[i] * queryVector[i];
+        for(int i = 0; i < a.length; ++i)
+            scalarProduct += a[i] * b[i];
 
         return scalarProduct;
+    }
+
+    private static double scalarProduct(double[] a, double[] b)
+    {
+        double scalarProduct = 0;
+
+        for(int i = 0; i < a.length; ++i)
+            scalarProduct += a[i] * b[i];
+
+        return scalarProduct;
+    }
+
+    public static DistanceMeasure distanceMeasure = new DistanceMeasure() {
+        @Override
+        public double compute(double[] a, double[] b) throws DimensionMismatchException {
+            return 1 - scalarProduct(a, b);
+        }
+    };
+
+    @Override
+    public double[] getPoint() {
+        double[] point = new double[features.length];
+        for(int i = 0; i < features.length; ++i)
+            point[i] = features[i];
+
+        return point;
     }
 }

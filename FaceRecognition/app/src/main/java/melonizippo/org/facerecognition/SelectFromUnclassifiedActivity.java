@@ -13,12 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
+
+import org.apache.commons.math3.ml.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.Clusterer;
+import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import melonizippo.org.facerecognition.database.FaceData;
 import melonizippo.org.facerecognition.database.FaceDatabaseStorage;
@@ -27,11 +34,12 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity
 {
     private final static String TAG = "SelectFromUnclassifiedActivity";
 
-    private Map<Integer, FaceData> unclassifiedFaces = new HashMap<>();
+    private Map<Integer, FaceData> unclassifiedFaces = new LinkedHashMap<>();
     private UnclassifiedFacesAdapter unclassifiedFacesAdapter;
     List<Integer> idIndexMapping = new ArrayList<>();
 
     private GridView previewsView;
+    private CheckBox clusterizeCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,6 +48,8 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity
         setContentView(R.layout.activity_select_from_unclassified);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        clusterizeCheckBox = findViewById(R.id.clusterizeCheckbox);
 
         //Setup grid view
         previewsView = findViewById(R.id.previewsView);
@@ -52,6 +62,8 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity
         loadUnclassifiedFaces();
 
         //Setup listeners
+        clusterizeCheckBox.setOnCheckedChangeListener((view, checked) -> loadUnclassifiedFaces());
+
         Button selectAllButton = findViewById(R.id.selectAllButton);
         selectAllButton.setOnClickListener((view) -> selectAll());
 
@@ -62,6 +74,8 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity
         addSelectedButton.setOnClickListener(view -> commitSelection());
     }
 
+
+
     @Override
     protected void onResume()
     {
@@ -71,14 +85,59 @@ public class SelectFromUnclassifiedActivity extends AppCompatActivity
 
     private void loadUnclassifiedFaces()
     {
-        unclassifiedFaces.putAll(FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces);
+        Map<Integer, FaceData> faces = new HashMap<>();
+        faces.putAll(FaceDatabaseStorage.getFaceDatabase().unclassifiedFaces);
+
         int[] filteredIds = getIntent().getIntArrayExtra("filteredIds");
         if(filteredIds != null)
             for(int id : filteredIds)
-                unclassifiedFaces.remove(id);
+                faces.remove(id);
 
+        unclassifiedFaces.clear();
+        if(clusterizeCheckBox.isChecked())
+        {
+            List<Map<Integer,FaceData>> clusters = clusterFaces(faces);
+            for (Map<Integer,FaceData> clusterMap: clusters)
+            {
+                unclassifiedFaces.putAll(clusterMap);
+            }
+        }
+        else
+        {
+            unclassifiedFaces.putAll(faces);
+        }
+
+        idIndexMapping.clear();
         idIndexMapping.addAll(unclassifiedFaces.keySet());
         unclassifiedFacesAdapter.notifyDataSetChanged();
+    }
+
+    private List<Map<Integer, FaceData>> clusterFaces(Map<Integer, FaceData> faces)
+    {
+        double eps = 1-Parameters.MIN_CONFIDENCE;
+        int minPts = Parameters.K;
+
+        List<Map<Integer,FaceData>> clusteringList = new ArrayList<>();
+
+        Clusterer<FaceData> clusterer = new DBSCANClusterer<>(eps, minPts, FaceData.distanceMeasure);
+        List<? extends Cluster<FaceData>> clusters = clusterer.cluster(faces.values());
+        for(Cluster<FaceData> cluster : clusters)
+        {
+            Map<Integer,FaceData> clusterMap = new HashMap<>();
+            for(FaceData data : cluster.getPoints())
+            {
+                Optional<Map.Entry<Integer,FaceData>> keyOptional = faces.entrySet().stream().filter((entry) -> entry.getValue() == data).findFirst();
+                if(keyOptional.isPresent())
+                {
+                    Integer key = keyOptional.get().getKey();
+                    clusterMap.put(key, data);
+                }
+            }
+
+            clusteringList.add(clusterMap);
+        }
+
+        return clusteringList;
     }
 
     private void selectAll()
