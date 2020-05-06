@@ -11,3 +11,6 @@ The app allows the user to check the database content, delete or add new identit
 [OpenCV](https://opencv.org/platforms/android/) library was used for data processing.
 
 For more details, see the presentation.
+
+# Cannot find the caffe model?
+If you get errors similar to `Can't open "/data/user/0/melonizippo.org.facerecognition/cache/caffe_model/resnet50_ft_caffe/resnet50_ft.caffemodel"`, then you must first extract the 7z multipart file called `resnet50_ft.7z.***` in the path `src/main/assets/caffe_model/resnet50_ft_caffe/`.
